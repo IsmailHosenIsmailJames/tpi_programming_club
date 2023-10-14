@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:tpi_programming_club/app/themes/app_theme_data.dart';
-import 'package:tpi_programming_club/app/views/home/drawer.dart';
+import 'package:tpi_programming_club/app/views/home/drawer/drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
