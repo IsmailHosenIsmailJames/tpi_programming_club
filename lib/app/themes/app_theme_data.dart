@@ -8,6 +8,8 @@ class AppThemeData extends GetxController {
   Rx<IconData> themeIcon = Icons.brightness_6.obs;
   Rx<Color> drawerAppBarColor = ConstantThemeData().drawerAppBarLightColor.obs;
   Rx<Color> navbarColor = ConstantThemeData().navbarColorLight.obs;
+  Rx<Color> containerBackGroundColor = Colors.grey.shade200.obs;
+  Rx<Color> iconColors = Colors.grey.shade100.obs;
 
   void initTheme() {
     var box = Hive.box('tpi_programming_club');
@@ -19,12 +21,16 @@ class AppThemeData extends GetxController {
         themeIcon.value = Icons.sunny;
         drawerAppBarColor.value = ConstantThemeData().drawerAppBarLightColor;
         navbarColor.value = ConstantThemeData().navbarColorLight;
+        containerBackGroundColor.value = Colors.grey.shade200;
+        iconColors.value = Colors.grey.shade800;
       } else if (userTheme == 'dark') {
         Get.changeThemeMode(ThemeMode.dark);
         themeModeName.value = 'dark';
         themeIcon.value = Icons.brightness_2;
         drawerAppBarColor.value = ConstantThemeData().drawerAppBarDarkColor;
         navbarColor.value = ConstantThemeData().navbarColorDark;
+        containerBackGroundColor.value = Colors.grey.shade800;
+        iconColors.value = Colors.grey.shade100;
       } else if (userTheme == 'system') {
         Get.changeThemeMode(ThemeMode.system);
         themeModeName.value = 'system';
@@ -35,11 +41,15 @@ class AppThemeData extends GetxController {
                 drawerAppBarColor.value =
                     ConstantThemeData().drawerAppBarDarkColor,
                 navbarColor.value = ConstantThemeData().navbarColorDark,
+                containerBackGroundColor.value = Colors.grey.shade800,
+                iconColors.value = Colors.grey.shade100,
               }
             : {
                 drawerAppBarColor.value =
                     ConstantThemeData().drawerAppBarLightColor,
                 navbarColor.value = ConstantThemeData().navbarColorLight,
+                containerBackGroundColor.value = Colors.grey.shade200,
+                iconColors.value = Colors.grey.shade800,
               };
       }
     } else {
@@ -56,6 +66,8 @@ class AppThemeData extends GetxController {
       themeIcon.value = Icons.sunny;
       drawerAppBarColor.value = ConstantThemeData().drawerAppBarLightColor;
       navbarColor.value = ConstantThemeData().navbarColorLight;
+      containerBackGroundColor.value = Colors.grey.shade200;
+      iconColors.value = Colors.grey.shade800;
     } else if (themeToChange == 'dark') {
       Get.changeThemeMode(ThemeMode.dark);
       box.put('theme_preference', 'dark');
@@ -63,6 +75,8 @@ class AppThemeData extends GetxController {
       themeIcon.value = Icons.brightness_2;
       drawerAppBarColor.value = ConstantThemeData().drawerAppBarDarkColor;
       navbarColor.value = ConstantThemeData().navbarColorDark;
+      containerBackGroundColor.value = Colors.grey.shade800;
+      iconColors.value = Colors.grey.shade100;
     } else if (themeToChange == 'system') {
       Get.changeThemeMode(ThemeMode.system);
       box.put('theme_preference', 'system');
@@ -74,11 +88,15 @@ class AppThemeData extends GetxController {
               drawerAppBarColor.value =
                   ConstantThemeData().drawerAppBarDarkColor,
               navbarColor.value = ConstantThemeData().navbarColorDark,
+              containerBackGroundColor.value = Colors.grey.shade800,
+              iconColors.value = Colors.grey.shade100,
             }
           : {
               drawerAppBarColor.value =
                   ConstantThemeData().drawerAppBarLightColor,
               navbarColor.value = ConstantThemeData().navbarColorLight,
+              containerBackGroundColor.value = Colors.grey.shade200,
+              iconColors.value = Colors.grey.shade800,
             };
     }
   }
