@@ -44,15 +44,19 @@ class _SelectTopicsState extends State<SelectTopics> {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               final data = snapshot.data!.value;
-              final decodedData = jsonDecode(jsonEncode(data));
-              saveDatabaseResponce(decodedData);
+              if (data != null) {
+                final decodedData = jsonDecode(jsonEncode(data));
+                saveDatabaseResponce(decodedData);
 
-              int count = int.parse(decodedData['count']);
+                int count = int.parse(decodedData['count']);
 
-              for (var i = 0; i < count; i++) {
-                var topic = decodedData['$i'];
-                TopicsModel obj = TopicsModel.fromJson(topic);
-                listOfTopics.add(obj);
+                for (var i = 0; i < count; i++) {
+                  var topic = decodedData['$i'];
+                  if (topic != null) {
+                    TopicsModel obj = TopicsModel.fromJson(topic);
+                    listOfTopics.add(obj);
+                  }
+                }
               }
             }
           } else if (snapshot.connectionState == ConnectionState.active) {
@@ -61,15 +65,21 @@ class _SelectTopicsState extends State<SelectTopics> {
                   color: Colors.blue, size: 40),
             );
           } else {
-            // var box = Hive.box("tpi_programming_club");
-            // int count = int.parse(box.get("/contents/topics/count/"));
+            try {
+              var box = Hive.box("tpi_programming_club");
+              int count = int.parse(box.get("/contents/topics/count/"));
 
-            // for (var i = 1; i < count + 1; i++) {
-            //   var topic = box.get("/contents/topics/$i/");
-            //   TopicsModel obj =
-            //       TopicsModel.fromJson(jsonDecode(jsonEncode(topic)));
-            //   listOfTopics.add(obj);
-            // }
+              for (var i = 1; i < count + 1; i++) {
+                var topic = box.get("/contents/topics/$i/");
+                if (topic != null) {
+                  TopicsModel obj =
+                      TopicsModel.fromJson(jsonDecode(jsonEncode(topic)));
+                  listOfTopics.add(obj);
+                }
+              }
+            } catch (e) {
+              print(e);
+            }
           }
 
           if (listOfTopics.isNotEmpty) {
@@ -186,9 +196,7 @@ class _SelectTopicsState extends State<SelectTopics> {
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
+                                  const Divider(),
                                   Text(
                                     listOfTopics[index].name,
                                     style: const TextStyle(
@@ -200,9 +208,7 @@ class _SelectTopicsState extends State<SelectTopics> {
                                     height: 5,
                                   ),
                                   Text(listOfTopics[index].description),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
+                                  const Divider(),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceAround,
@@ -243,8 +249,71 @@ class _SelectTopicsState extends State<SelectTopics> {
               ],
             );
           }
-          return const Center(
-              child: Text("Error When Loading. Cheak internet connection"));
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Colors.blue, width: 3),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Select a topics or create your own unique topics",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shadowColor: Colors.transparent,
+                            minimumSize: const Size(double.infinity, 30),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                          ),
+                          onPressed: () {
+                            showDialog<String>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Are you sure ?'),
+                                content: const Text(
+                                    'Creating unnecessary topics should be always avoided. Make sure you really need to create a topics.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context, 'Cancel');
+                                    },
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context, 'OK');
+                                      Get.to(() => const CreateTopics());
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          child: const Text("Create Topic"),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const Text("Error When Loading. Cheak internet connection"),
+            ],
+          );
         },
       ),
     );

@@ -36,15 +36,19 @@ class _HomePageContentState extends State<HomePageContent> {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
             final data = snapshot.data!.value;
-            final decodedData = jsonDecode(jsonEncode(data));
-            saveDatabaseResponce(decodedData);
+            if (data != null) {
+              final decodedData = jsonDecode(jsonEncode(data));
+              saveDatabaseResponce(decodedData);
 
-            int count = int.parse(decodedData['count']);
+              int count = int.parse(decodedData['count']);
 
-            for (var i = 0; i < count; i++) {
-              var topic = decodedData['$i'];
-              TopicsModel obj = TopicsModel.fromJson(topic);
-              listOfTopics.add(obj);
+              for (var i = 0; i < count; i++) {
+                var topic = decodedData['$i'];
+                if (topic != null) {
+                  TopicsModel obj = TopicsModel.fromJson(topic);
+                  listOfTopics.add(obj);
+                }
+              }
             }
           }
         } else if (snapshot.connectionState == ConnectionState.active) {
@@ -53,15 +57,21 @@ class _HomePageContentState extends State<HomePageContent> {
                 color: Colors.blue, size: 40),
           );
         } else {
-          // var box = Hive.box("tpi_programming_club");
-          // int count = int.parse(box.get("/contents/topics/count/"));
+          try {
+            var box = Hive.box("tpi_programming_club");
+            int count = int.parse(box.get("/contents/topics/count/"));
 
-          // for (var i = 1; i < count + 1; i++) {
-          //   var topic = box.get("/contents/topics/$i/");
-          //   TopicsModel obj =
-          //       TopicsModel.fromJson(jsonDecode(jsonEncode(topic)));
-          //   listOfTopics.add(obj);
-          // }
+            for (var i = 1; i < count + 1; i++) {
+              var topic = box.get("/contents/topics/$i/", defaultValue: null);
+              if (topic != null) {
+                TopicsModel obj =
+                    TopicsModel.fromJson(jsonDecode(jsonEncode(topic)));
+                listOfTopics.add(obj);
+              }
+            }
+          } catch (e) {
+            print(e);
+          }
           return Center(
             child: LoadingAnimationWidget.staggeredDotsWave(
                 color: Colors.blue, size: 40),
@@ -159,9 +169,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
+                                const Divider(),
                                 Text(
                                   listOfTopics[index].name,
                                   style: const TextStyle(
@@ -173,9 +181,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                   height: 5,
                                 ),
                                 Text(listOfTopics[index].description),
-                                const SizedBox(
-                                  height: 5,
-                                ),
+                                const Divider(),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,

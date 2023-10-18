@@ -65,8 +65,16 @@ class _CreateTopicsState extends State<CreateTopics> {
                     child: LoadingAnimationWidget.staggeredDotsWave(
                         color: Colors.white, size: 40),
                   );
+                  final count = await FirebaseDatabase.instance
+                      .ref()
+                      .child("/contents/topics/count/")
+                      .get();
+                  int id = 0;
+                  if (count.value != null) {
+                    id = int.parse(count.value.toString());
+                  }
                   PickPhotoFileWithUrlMobile img =
-                      await pickPhotoMobile("/contents/topics/");
+                      await pickPhotoMobile("/contents/topics/$id");
                   if (img.imageFile != null) {
                     controller.imageWidget.value = SizedBox(
                       child: Image.file(img.imageFile!, fit: BoxFit.cover),
@@ -176,7 +184,10 @@ class _CreateTopicsState extends State<CreateTopics> {
                                     .ref()
                                     .child("/contents/topics/count/")
                                     .get();
-                                int id = int.parse(count.value.toString());
+                                int id = 0;
+                                if (count.value != null) {
+                                  id = int.parse(count.value.toString());
+                                }
                                 TopicsModel topicsModel = TopicsModel(
                                   id: "$id",
                                   name: titleController.text,
@@ -191,10 +202,10 @@ class _CreateTopicsState extends State<CreateTopics> {
                                 await ref.set(topicsModel.toJson());
 
                                 await FirebaseDatabase.instance
-                                    .ref("/contents/topics/")
-                                    .update({
-                                  "count": "${(id + 1)}",
-                                });
+                                    .ref("/contents/topics/count")
+                                    .set(
+                                      "${(id + 1)}",
+                                    );
                                 Get.to(() => const SelectTopics());
 
                                 // ignore: use_build_context_synchronously
