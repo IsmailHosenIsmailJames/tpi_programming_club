@@ -23,6 +23,29 @@ class _PostEditorState extends State<PostEditor> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Markdown"),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              if (_fromKey.currentState!.validate()) {
+                Get.to(
+                  () => MarkDownOutPut(
+                    markdown: editorController.text,
+                    name: widget.name,
+                    id: widget.id,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              shadowColor: Colors.transparent,
+              backgroundColor: ConstantThemeData().primaryColour,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(100),
+              ),
+            ),
+            child: const Icon(Icons.forward),
+          ),
+        ],
       ),
       drawer: const HomeDrawer(),
       body: SafeArea(
@@ -31,32 +54,6 @@ class _PostEditorState extends State<PostEditor> {
           child: ListView(
             reverse: true,
             children: [
-              Row(
-                children: [
-                  const Spacer(),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_fromKey.currentState!.validate()) {
-                        Get.to(
-                          () => MarkDownOutPut(
-                            markdown: editorController.text,
-                            name: widget.name,
-                            id: widget.id,
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shadowColor: Colors.transparent,
-                      backgroundColor: ConstantThemeData().primaryColour,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                    ),
-                    child: const Icon(Icons.forward),
-                  ),
-                ],
-              ),
               const SizedBox(
                 height: 2,
               ),

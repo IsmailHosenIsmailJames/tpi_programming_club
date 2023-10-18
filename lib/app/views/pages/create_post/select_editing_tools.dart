@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'appflowy/appfloy_editor.dart';
 import 'markdown/create_post_markdown.dart';
 
 class SelectEditingTools extends StatefulWidget {
@@ -154,7 +155,12 @@ class _SelectEditingToolsState extends State<SelectEditingTools> {
                                 borderRadius: BorderRadius.circular(100),
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Get.to(() => MyAppfloyEditor(
+                                    name: widget.name,
+                                    id: widget.id,
+                                  ));
+                            },
                             child: const Text(
                               "AppFlowy",
                               style: TextStyle(
@@ -167,10 +173,10 @@ class _SelectEditingToolsState extends State<SelectEditingTools> {
                           ),
                           IconButton(
                             onPressed: () async {
-                              if (!await launchUrl(Uri.parse(
-                                  "https://www.markdownguide.org/basic-syntax/"))) {
+                              if (!await launchUrl(
+                                  Uri.parse("https://appflowy.io/"))) {
                                 throw Exception(
-                                    'Could not launch https://www.markdownguide.org/basic-syntax/');
+                                    'Could not launch https://appflowy.io/');
                               }
                             },
                             icon: const Icon(

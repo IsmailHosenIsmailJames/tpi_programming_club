@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 
 class MyAppfloyEditor extends StatefulWidget {
-  const MyAppfloyEditor({super.key});
+  const MyAppfloyEditor({super.key, required this.name, required this.id});
+  final String name;
+  final String id;
 
   @override
   State<MyAppfloyEditor> createState() => _MyAppfloyEditorState();

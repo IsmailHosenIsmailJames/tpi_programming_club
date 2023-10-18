@@ -1,0 +1,28 @@
+{
+    "id": "id",
+    "contentType":"contentType",
+    "topic": "topic",
+    "topicId": "topicId",
+    "title": "title",
+    "img":"img",
+    "owner": "owner",
+    "description": "description",
+    "content": "content",
+    "likeCount": "like_count",
+    "likes": {
+        "likeId": {
+            "email": "email",
+            "date": "date"
+        }
+    },
+    "commentsCount": "commentCount",
+    "comments": {
+        "commentId": {
+            "email": "email",
+            "date": "date",
+            "message": "message"
+        }
+    },
+    "share": "share",
+    "impression": "impression"
+}

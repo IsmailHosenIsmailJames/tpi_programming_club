@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:tpi_programming_club/app/views/pages/home/home.dart';
 
 import 'app/themes/app_theme_data.dart';
-import 'app/views/pages/create_post/appflowy/appfloy_editor.dart';
 import 'app/views/pages/home/getx_controller.dart';
 import 'firebase_options.dart';
 
@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
         Get.put(HomeGetController());
         controller.initTheme();
       },
-      home: const MyAppfloyEditor(),
+      home: const HomePage(),
     );
   }
 }

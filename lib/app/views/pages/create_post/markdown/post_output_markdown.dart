@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:get/get.dart';
+import 'package:tpi_programming_club/app/views/pages/create_post/publish/publish_post.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -28,7 +30,16 @@ class _MarkDownOutPutState extends State<MarkDownOutPut> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.to(
+                  () => PublishPost(
+                    name: widget.name,
+                    id: widget.id,
+                    content: widget.markdown,
+                    contentType: "markdown",
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 shadowColor: Colors.transparent,
