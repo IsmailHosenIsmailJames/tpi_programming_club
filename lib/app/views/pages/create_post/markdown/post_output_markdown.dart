@@ -40,7 +40,7 @@ class _MarkDownOutPutState extends State<MarkDownOutPut> {
                 "Post",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 30,
+                  fontSize: 26,
                 ),
               ),
             ),
