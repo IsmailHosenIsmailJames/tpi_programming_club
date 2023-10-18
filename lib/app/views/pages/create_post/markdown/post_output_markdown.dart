@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../themes/const_theme_data.dart';
 
 class MarkDownOutPut extends StatefulWidget {
   final String markdown;
-  const MarkDownOutPut({super.key, required this.markdown});
+  final String name;
+  final String id;
+  const MarkDownOutPut(
+      {super.key,
+      required this.markdown,
+      required this.name,
+      required this.id});
 
   @override
   State<MarkDownOutPut> createState() => _MarkDownOutPutState();
@@ -16,16 +21,16 @@ class _MarkDownOutPutState extends State<MarkDownOutPut> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const HomeDrawer(),
       appBar: AppBar(
-        backgroundColor: ConstantThemeData().primaryColour,
-        shadowColor: Colors.transparent,
+        title: const Text("OUTPUT"),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               onPressed: () {},
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
+                backgroundColor: Colors.blue,
                 shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(100),
@@ -34,8 +39,7 @@ class _MarkDownOutPutState extends State<MarkDownOutPut> {
               child: const Text(
                 "Post",
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
+                  color: Colors.white,
                   fontSize: 30,
                 ),
               ),

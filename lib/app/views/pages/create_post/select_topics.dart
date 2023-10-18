@@ -11,8 +11,8 @@ import 'package:tpi_programming_club/app/views/pages/create_post/create_topics.d
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 
 import '../../../themes/app_theme_data.dart';
-import '../home/contents/classes_on_topics/classes_on_topic.dart';
 import '../home/contents/topics_model.dart';
+import 'select_editing_tools.dart';
 
 class SelectTopics extends StatefulWidget {
   const SelectTopics({super.key});
@@ -145,11 +145,12 @@ class _SelectTopicsState extends State<SelectTopics> {
                       return GetX<AppThemeData>(
                         builder: (controller) => GestureDetector(
                           onTap: () {
-                            String path = "/contents/${listOfTopics[index].id}";
+                            String name = listOfTopics[index].name;
+                            String id = listOfTopics[index].id;
                             Get.to(
-                              ClassesOnTopics(
-                                path: path,
-                                topicsName: listOfTopics[index].name,
+                              SelectEditingTools(
+                                name: name,
+                                id: id,
                               ),
                             );
                           },

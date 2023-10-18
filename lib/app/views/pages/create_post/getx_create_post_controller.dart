@@ -9,6 +9,6 @@ class CreatePostController extends GetxController {
     child: Text("Choice an Image"),
   ).obs;
   Rx<Widget> loadingIconOnUploadeTopics = const SizedBox(
-    child: Text("Choice an Image"),
+    child: Text("Upload this topics"),
   ).obs;
 }

@@ -216,7 +216,7 @@ class _CreateTopicsState extends State<CreateTopics> {
                             }
                             controller.loadingIconOnUploadeTopics.value =
                                 const SizedBox(
-                              child: Text("Choice an Image"),
+                              child: Text("Uploaded Successfully"),
                             );
                           },
                           child: controller.loadingIconOnUploadeTopics.value,
