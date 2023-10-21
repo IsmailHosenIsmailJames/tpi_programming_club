@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tpi_programming_club/app/views/pages/home/home.dart';
 
 import 'app/themes/app_theme_data.dart';
+import 'app/views/pages/create_post/quill_html_editor/quill_html _editor.dart';
 import 'app/views/pages/home/getx_controller.dart';
 import 'firebase_options.dart';
 

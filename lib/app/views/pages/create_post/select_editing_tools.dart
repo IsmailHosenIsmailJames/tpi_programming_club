@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'appflowy/appfloy_editor.dart';
+import 'quill_html_editor/quill_html _editor.dart';
 import 'markdown/create_post_markdown.dart';
 
 class SelectEditingTools extends StatefulWidget {
