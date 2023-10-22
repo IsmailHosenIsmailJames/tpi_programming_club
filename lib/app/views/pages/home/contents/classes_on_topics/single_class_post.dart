@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:get/get.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
-import 'package:tpi_programming_club/app/themes/app_theme_data.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,24 +31,20 @@ class _SingleClassPostState extends State<SingleClassPost> {
       ),
       drawer: const HomeDrawer(),
       body: widget.contentType == "quill"
-          ? GetX<AppThemeData>(
-              builder: (controller) => QuillHtmlEditor(
-                controller: quillController,
-                text: widget.content,
-                isEnabled: false,
-                minHeight: MediaQuery.of(context).size.height,
-              ),
+          ? QuillHtmlEditor(
+              controller: quillController,
+              text: widget.content,
+              isEnabled: false,
+              minHeight: MediaQuery.of(context).size.height,
             )
-          : GetX<AppThemeData>(
-              builder: (controller) => Markdown(
-                data: widget.content,
-                selectable: true,
-                onTapLink: (text, href, title) async {
-                  if (!await launchUrl(Uri.parse(href!))) {
-                    throw Exception('Could not launch $href');
-                  }
-                },
-              ),
+          : Markdown(
+              data: widget.content,
+              selectable: true,
+              onTapLink: (text, href, title) async {
+                if (!await launchUrl(Uri.parse(href!))) {
+                  throw Exception('Could not launch $href');
+                }
+              },
             ),
     );
   }

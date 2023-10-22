@@ -7,10 +7,11 @@ import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/data/models/account_model.dart';
 import 'package:tpi_programming_club/app/views/accounts/account_get_controller.dart';
+import 'package:tpi_programming_club/app/views/accounts/init.dart';
+import 'package:tpi_programming_club/app/views/accounts/verification/sent_verification_email.dart';
 
 import '../../../themes/app_theme_data.dart';
 import '../../../themes/const_theme_data.dart';
-import '../init.dart';
 import '../login/login.dart';
 
 class SignIn extends StatefulWidget {
@@ -55,6 +56,8 @@ class _SignInState extends State<SignIn> {
             .collection("user/")
             .doc(email.text.trim())
             .set(model.toJson());
+
+        await sentValidationEmail();
         Get.offAll(() => const InIt());
       } on FirebaseAuthException catch (e) {
         Fluttertoast.showToast(

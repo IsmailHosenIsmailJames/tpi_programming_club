@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:tpi_programming_club/app/views/pages/home/home.dart';
+import 'package:tpi_programming_club/app/views/accounts/init.dart';
 
 import 'app/themes/app_theme_data.dart';
 import 'app/views/pages/home/getx_controller.dart';
@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
         Get.put(HomeGetController());
         controller.initTheme();
       },
-      home: const HomePage(),
+      home: const InIt(),
     );
   }
 }
