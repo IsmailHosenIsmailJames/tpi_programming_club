@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -33,7 +34,9 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.path);
+    if (kDebugMode) {
+      print(widget.path);
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -56,7 +59,6 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
 
                 for (var i = 0; i < count; i++) {
                   var topic = decodedData['$i'];
-                  print(topic);
                   if (topic != null) {
                     PostModel obj = PostModel.fromMap(topic);
                     listOfTopics.add(obj);
@@ -73,7 +75,6 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
             try {
               var box = Hive.box("tpi_programming_club");
               int count = int.parse(box.get(widget.path));
-              print("No Internet");
 
               for (var i = 0; i < count; i++) {
                 var topic = box.get("${widget.path}/$i/", defaultValue: null);
@@ -84,7 +85,9 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
                 }
               }
             } catch (e) {
-              print(e);
+              if (kDebugMode) {
+                print(e);
+              }
             }
           }
           if (listOfTopics.isNotEmpty) {

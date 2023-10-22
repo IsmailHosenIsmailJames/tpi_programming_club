@@ -1,11 +1,8 @@
-import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:tpi_programming_club/app/views/pages/create_post/quill_html_editor/quill_html%20_editor.dart';
-import 'package:tpi_programming_club/app/views/pages/home/contents/home_content.dart';
 import 'package:tpi_programming_club/app/views/pages/home/home.dart';
 
 import 'app/themes/app_theme_data.dart';
@@ -35,9 +32,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'TPI Programming Club',
       themeMode: ThemeMode.system,
-      localizationsDelegates: const [
-        AppFlowyEditorLocalizations.delegate,
-      ],
       darkTheme: ThemeData.dark().copyWith(
         primaryColor: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,

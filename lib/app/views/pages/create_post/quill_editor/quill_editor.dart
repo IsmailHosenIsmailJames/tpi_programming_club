@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
-import 'package:tpi_programming_club/app/themes/app_theme_data.dart';
 import 'package:tpi_programming_club/app/views/pages/create_post/publish/publish_post.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 
