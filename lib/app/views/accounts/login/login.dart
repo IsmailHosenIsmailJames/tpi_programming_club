@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:tpi_programming_club/app/views/accounts/account_get_controller.dart';
+import 'package:tpi_programming_club/app/views/accounts/login_widget_controller.dart';
 
 import '../../../themes/const_theme_data.dart';
 import '../../../themes/app_theme_data.dart';
@@ -23,8 +23,8 @@ class _LogInState extends State<LogIn> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   final validationKey = GlobalKey<FormState>();
-  final AccountGetController accountGetController =
-      Get.put(AccountGetController());
+  final AccountWidgetController accountGetController =
+      Get.put(AccountWidgetController());
 
   void logIn() async {
     if (validationKey.currentState!.validate()) {

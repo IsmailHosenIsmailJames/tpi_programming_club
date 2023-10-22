@@ -4,6 +4,7 @@ class PostModel {
   String id;
   String contentType;
   String topic;
+  String ownerName;
   String topicId;
   String title;
   String img;
@@ -25,6 +26,7 @@ class PostModel {
     required this.title,
     required this.img,
     required this.owner,
+    required this.ownerName,
     required this.description,
     required this.content,
     required this.likeCount,
@@ -40,22 +42,22 @@ class PostModel {
   String toJson() => json.encode(toMap());
 
   factory PostModel.fromMap(Map<String, dynamic> json) => PostModel(
-        id: json["id"],
-        contentType: json["contentType"],
-        topic: json["topic"],
-        topicId: json["topicId"],
-        title: json["title"],
-        img: json["img"],
-        owner: json["owner"],
-        description: json["description"],
-        content: json["content"],
-        likeCount: json["likeCount"],
-        likes: Likes.fromMap(json["likes"]),
-        commentsCount: json["commentsCount"],
-        comments: Comments.fromMap(json["comments"]),
-        share: json["share"],
-        impression: json["impression"],
-      );
+      id: json["id"],
+      contentType: json["contentType"],
+      topic: json["topic"],
+      topicId: json["topicId"],
+      title: json["title"],
+      img: json["img"],
+      owner: json["owner"],
+      description: json["description"],
+      content: json["content"],
+      likeCount: json["likeCount"],
+      likes: Likes.fromMap(json["likes"]),
+      commentsCount: json["commentsCount"],
+      comments: Comments.fromMap(json["comments"]),
+      share: json["share"],
+      impression: json["impression"],
+      ownerName: json['ownerName']);
 
   Map<String, dynamic> toMap() => {
         "id": id,
@@ -73,6 +75,7 @@ class PostModel {
         "comments": comments.toMap(),
         "share": share,
         "impression": impression,
+        'ownerName': ownerName,
       };
 }
 

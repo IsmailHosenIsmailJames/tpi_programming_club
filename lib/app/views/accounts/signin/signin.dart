@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:tpi_programming_club/app/data/models/account_model.dart';
-import 'package:tpi_programming_club/app/views/accounts/account_get_controller.dart';
+import 'package:tpi_programming_club/app/views/accounts/login_widget_controller.dart';
 import 'package:tpi_programming_club/app/views/accounts/init.dart';
 import 'package:tpi_programming_club/app/views/accounts/verification/sent_verification_email.dart';
 
+import '../../../data/models/account_model.dart';
 import '../../../themes/app_theme_data.dart';
 import '../../../themes/const_theme_data.dart';
 import '../login/login.dart';
@@ -30,8 +30,8 @@ class _SignInState extends State<SignIn> {
   FocusNode passwordFocusNode = FocusNode();
   FocusNode emailFocusNode = FocusNode();
   FocusNode confirmFocusNode = FocusNode();
-  final AccountGetController accountGetController =
-      Get.put(AccountGetController());
+  final AccountWidgetController accountGetController =
+      Get.put(AccountWidgetController());
 
   void signUp() async {
     if (signUpValidationKey.currentState!.validate()) {
@@ -47,10 +47,8 @@ class _SignInState extends State<SignIn> {
           userName: name.text.trim(),
           userEmail: email.text.trim(),
           img: "null",
-          postCount: "0",
-          posts: Posts(path: "null"),
-          followerCount: "0",
-          followers: Followers(email: "null"),
+          posts: <String>[],
+          followers: <String>[],
         );
         await FirebaseFirestore.instance
             .collection("user/")

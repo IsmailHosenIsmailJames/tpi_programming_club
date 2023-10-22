@@ -8,6 +8,7 @@
     "owner": "owner",
     "description": "description",
     "content": "content",
+    "ownerName":"ownerName",
     "likeCount": "0",
     "likes": {
       "likeId": {"email": "email", "date": "date"}

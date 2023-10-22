@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class AccountGetController extends GetxController {
+class AccountWidgetController extends GetxController {
   Rx<Widget> signUp = const Center(
     child: Text(
       "Sign Up",

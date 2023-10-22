@@ -1,21 +1,31 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:tpi_programming_club/app/views/accounts/account_info_controller.dart';
 import 'package:tpi_programming_club/app/views/pages/home/home.dart';
 
 import '../../../themes/app_theme_data.dart';
 import '../create_post/select_topics.dart';
 
-class HomeDrawer extends StatelessWidget {
+class HomeDrawer extends StatefulWidget {
   const HomeDrawer({super.key});
 
+  @override
+  State<HomeDrawer> createState() => _HomeDrawerState();
+}
+
+class _HomeDrawerState extends State<HomeDrawer> {
+  final accountInfoController = Get.put(AccountInfoController());
+  final appthemeController = Get.put(AppThemeData());
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: Column(
         children: [
-          GetX<AppThemeData>(
-            builder: (controller) => Container(
-              color: controller.drawerAppBarColor.value,
+          Obx(
+            () => Container(
+              color: appthemeController.drawerAppBarColor.value,
               child: SafeArea(
                 child: Column(
                   children: [
@@ -36,35 +46,58 @@ class HomeDrawer extends StatelessWidget {
                               borderRadius: BorderRadius.circular(100),
                               color: Colors.lightGreen,
                             ),
-                            child: const Center(
-                              child: Text(
-                                "MD",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                            child: Center(
+                              child: accountInfoController.img.value == 'null'
+                                  ? Text(
+                                      accountInfoController.name.value
+                                          .substring(0, 2),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 40,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),
+                                      child: CachedNetworkImage(
+                                        imageUrl:
+                                            accountInfoController.img.value,
+                                        fit: BoxFit.scaleDown,
+                                        progressIndicatorBuilder:
+                                            (context, url, downloadProgress) =>
+                                                Center(
+                                          child: LoadingAnimationWidget
+                                              .staggeredDotsWave(
+                                            color: Colors.white,
+                                            size: 40,
+                                          ),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8),
                           child: GetX<AppThemeData>(
-                            builder: (controller) => IconButton(
+                            builder: (appthemeController) => IconButton(
                               onPressed: () {
-                                if (controller.themeModeName.value ==
+                                if (appthemeController.themeModeName.value ==
                                     'system') {
-                                  controller.setTheme('dark');
-                                } else if (controller.themeModeName.value ==
+                                  appthemeController.setTheme('dark');
+                                } else if (appthemeController
+                                        .themeModeName.value ==
                                     'dark') {
-                                  controller.setTheme('light');
-                                } else if (controller.themeModeName.value ==
+                                  appthemeController.setTheme('light');
+                                } else if (appthemeController
+                                        .themeModeName.value ==
                                     'light') {
-                                  controller.setTheme('system');
+                                  appthemeController.setTheme('system');
                                 }
                               },
-                              icon: Icon(controller.themeIcon.value),
+                              icon: Icon(appthemeController.themeIcon.value),
                             ),
                           ),
                         ),
@@ -80,31 +113,28 @@ class HomeDrawer extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Column(
+                          Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "User Name",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: Colors.white),
+                                accountInfoController.name.value,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                               Text(
-                                "useremail@email.com",
-                                style: TextStyle(
+                                accountInfoController.email.value,
+                                style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 16,
+                                  fontSize: 12,
+                                  overflow: TextOverflow.fade,
                                 ),
                               ),
                             ],
-                          ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.arrow_upward,
-                            ),
                           ),
                         ],
                       ),
@@ -115,8 +145,8 @@ class HomeDrawer extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: GetX<AppThemeData>(
-              builder: (controller) => ListView(
+            child: Obx(
+              () => ListView(
                 children: [
                   TextButton(
                     onPressed: () {
@@ -130,7 +160,7 @@ class HomeDrawer extends StatelessWidget {
                         ),
                         Icon(
                           Icons.home_outlined,
-                          color: controller.iconColors.value,
+                          color: appthemeController.iconColors.value,
                         ),
                         const SizedBox(
                           width: 30,
@@ -138,7 +168,7 @@ class HomeDrawer extends StatelessWidget {
                         Text(
                           "Home",
                           style: TextStyle(
-                            color: controller.iconColors.value,
+                            color: appthemeController.iconColors.value,
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                           ),
@@ -159,7 +189,7 @@ class HomeDrawer extends StatelessWidget {
                         ),
                         Icon(
                           Icons.analytics_outlined,
-                          color: controller.iconColors.value,
+                          color: appthemeController.iconColors.value,
                         ),
                         const SizedBox(
                           width: 30,
@@ -167,7 +197,7 @@ class HomeDrawer extends StatelessWidget {
                         Text(
                           "Your Progress",
                           style: TextStyle(
-                            color: controller.iconColors.value,
+                            color: appthemeController.iconColors.value,
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                           ),
@@ -190,7 +220,7 @@ class HomeDrawer extends StatelessWidget {
                         ),
                         Icon(
                           Icons.create,
-                          color: controller.iconColors.value,
+                          color: appthemeController.iconColors.value,
                         ),
                         const SizedBox(
                           width: 30,
@@ -198,7 +228,7 @@ class HomeDrawer extends StatelessWidget {
                         Text(
                           "Create a Tutorial",
                           style: TextStyle(
-                            color: controller.iconColors.value,
+                            color: appthemeController.iconColors.value,
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                           ),
@@ -219,7 +249,7 @@ class HomeDrawer extends StatelessWidget {
                         ),
                         Icon(
                           Icons.admin_panel_settings_outlined,
-                          color: controller.iconColors.value,
+                          color: appthemeController.iconColors.value,
                         ),
                         const SizedBox(
                           width: 30,
@@ -227,7 +257,7 @@ class HomeDrawer extends StatelessWidget {
                         Text(
                           "Admin Panel",
                           style: TextStyle(
-                            color: controller.iconColors.value,
+                            color: appthemeController.iconColors.value,
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                           ),
@@ -248,7 +278,7 @@ class HomeDrawer extends StatelessWidget {
                         ),
                         Icon(
                           Icons.settings_outlined,
-                          color: controller.iconColors.value,
+                          color: appthemeController.iconColors.value,
                         ),
                         const SizedBox(
                           width: 30,
@@ -256,7 +286,7 @@ class HomeDrawer extends StatelessWidget {
                         Text(
                           "Settings",
                           style: TextStyle(
-                            color: controller.iconColors.value,
+                            color: appthemeController.iconColors.value,
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                           ),
@@ -277,7 +307,7 @@ class HomeDrawer extends StatelessWidget {
                         ),
                         Icon(
                           Icons.privacy_tip_outlined,
-                          color: controller.iconColors.value,
+                          color: appthemeController.iconColors.value,
                         ),
                         const SizedBox(
                           width: 30,
@@ -285,7 +315,7 @@ class HomeDrawer extends StatelessWidget {
                         Text(
                           "Privacy Policy",
                           style: TextStyle(
-                            color: controller.iconColors.value,
+                            color: appthemeController.iconColors.value,
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                           ),
@@ -306,7 +336,7 @@ class HomeDrawer extends StatelessWidget {
                         ),
                         Icon(
                           Icons.feedback_outlined,
-                          color: controller.iconColors.value,
+                          color: appthemeController.iconColors.value,
                         ),
                         const SizedBox(
                           width: 30,
@@ -314,7 +344,7 @@ class HomeDrawer extends StatelessWidget {
                         Text(
                           "Feedback",
                           style: TextStyle(
-                            color: controller.iconColors.value,
+                            color: appthemeController.iconColors.value,
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                           ),

@@ -1,7 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:tpi_programming_club/app/data/models/account_model.dart';
 import 'package:tpi_programming_club/app/themes/app_theme_data.dart';
+import 'package:tpi_programming_club/app/views/accounts/account_info_controller.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:tpi_programming_club/app/views/pages/home/getx_controller.dart';
 import 'package:tpi_programming_club/app/views/pages/home/contents/home_content.dart';
@@ -21,6 +26,34 @@ class _HomePageState extends State<HomePage> {
       PersistentTabController(initialIndex: 0);
 
   final homeControllersGet = Get.put(HomeGetController());
+  final accountInfoController = Get.put(AccountInfoController());
+
+  Future<void> getAccountInfo() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final ref = FirebaseFirestore.instance.collection('user').doc(user.email);
+    final userData = await ref.get();
+
+    AccountModel accountModel = AccountModel(
+      userName: userData['userName'],
+      userEmail: userData['userEmail'],
+      img: userData['img'],
+      posts: userData['posts'],
+      followers: userData['followers'],
+    );
+    accountInfoController.name.value = accountModel.userName;
+    accountInfoController.email.value = accountModel.userEmail;
+    accountInfoController.img.value = accountModel.img;
+    accountInfoController.posts.value = accountModel.posts;
+    accountInfoController.followers.value = accountModel.followers;
+    var box = Hive.box("tpi_programming_club");
+    box.put("userInfo", accountModel.toJson());
+  }
+
+  @override
+  void initState() {
+    getAccountInfo();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

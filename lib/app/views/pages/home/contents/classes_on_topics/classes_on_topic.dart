@@ -27,9 +27,7 @@ class ClassesOnTopics extends StatefulWidget {
 class _ClassesOnTopicsState extends State<ClassesOnTopics> {
   Future saveDatabaseResponce(Map<String, dynamic> decodedData) async {
     var box = Hive.box("tpi_programming_club");
-    decodedData.forEach((key, value) {
-      box.put("/contents/topics/$key/", value);
-    });
+    box.put(widget.path, decodedData);
   }
 
   @override
@@ -74,14 +72,15 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
           } else {
             try {
               var box = Hive.box("tpi_programming_club");
-              int count = int.parse(box.get(widget.path));
+              var data = box.get(widget.path);
+              if (data != null) {
+                int count = int.parse(data['classCount']);
 
-              for (var i = 0; i < count; i++) {
-                var topic = box.get("${widget.path}/$i/", defaultValue: null);
-                if (topic != null) {
-                  PostModel obj =
-                      PostModel.fromJson(jsonDecode(jsonEncode(topic)));
-                  listOfTopics.add(obj);
+                for (var i = 0; i < count; i++) {
+                  if (data['$i'] != null) {
+                    PostModel obj = PostModel.fromMap(Map.from(data['$i']));
+                    listOfTopics.add(obj);
+                  }
                 }
               }
             } catch (e) {
@@ -172,14 +171,45 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
                                         decoration: BoxDecoration(
                                             borderRadius:
                                                 BorderRadius.circular(100),
-                                            color: Colors.green),
-                                        child: const Center(
-                                          child: Text(
-                                            "MD",
-                                            style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                                            color: const Color.fromARGB(
+                                                83, 158, 158, 158)),
+                                        child: Center(
+                                          child: listOfTopics[index].img ==
+                                                  'null'
+                                              ? Text(
+                                                  listOfTopics[index]
+                                                      .ownerName
+                                                      .substring(0, 2),
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 40,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                )
+                                              : ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
+                                                  child: CachedNetworkImage(
+                                                    imageUrl:
+                                                        listOfTopics[index].img,
+                                                    fit: BoxFit.scaleDown,
+                                                    progressIndicatorBuilder:
+                                                        (context, url,
+                                                                downloadProgress) =>
+                                                            Center(
+                                                      child:
+                                                          LoadingAnimationWidget
+                                                              .staggeredDotsWave(
+                                                        color: Colors.white,
+                                                        size: 40,
+                                                      ),
+                                                    ),
+                                                    errorWidget: (context, url,
+                                                            error) =>
+                                                        const Icon(Icons.error),
+                                                  ),
+                                                ),
                                         ),
                                       ),
                                       const SizedBox(
@@ -191,15 +221,24 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          const Text(
-                                            "Name",
-                                            style: TextStyle(
+                                          Text(
+                                            listOfTopics[index]
+                                                        .ownerName
+                                                        .length >
+                                                    15
+                                                ? "${listOfTopics[index].ownerName.substring(0, 15)}..."
+                                                : listOfTopics[index].ownerName,
+                                            style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           Text(
-                                            listOfTopics[index].owner,
+                                            listOfTopics[index].owner.length >
+                                                    20
+                                                ? "${listOfTopics[index].owner.substring(0, 20)}..."
+                                                : listOfTopics[index].owner,
+                                            overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                               fontSize: 12,
                                             ),

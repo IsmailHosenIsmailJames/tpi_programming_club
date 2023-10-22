@@ -1,11 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/data/models/post_models.dart';
+import 'package:tpi_programming_club/app/views/accounts/account_info_controller.dart';
 import 'package:tpi_programming_club/app/views/pages/create_post/select_topics.dart';
 
 import '../../../../core/image_picker.dart';
+import '../../../../data/models/account_model.dart';
 import '../../drawer/drawer.dart';
 import '../getx_create_post_controller.dart';
 
@@ -27,8 +31,9 @@ class PublishPost extends StatefulWidget {
 }
 
 class _PublishPostState extends State<PublishPost> {
-  final String owner = "owner@email.com";
+  String? owner = FirebaseAuth.instance.currentUser!.email;
   final controller = Get.put(CreatePostController());
+  final accuntInfo = Get.put(AccountInfoController());
 
   final validationKey = GlobalKey<FormState>();
   TextEditingController titleController = TextEditingController();
@@ -194,6 +199,29 @@ class _PublishPostState extends State<PublishPost> {
                                 if (count.value != null) {
                                   id = int.parse(count.value.toString());
                                 }
+
+                                final classContentRef = FirebaseDatabase
+                                    .instance
+                                    .ref("classContent");
+                                int classContentCount = 0;
+                                var classContentCountData =
+                                    await classContentRef
+                                        .child('contentCount')
+                                        .get();
+                                if (classContentCountData.value != null) {
+                                  classContentCount = int.parse(
+                                      classContentCountData.value.toString());
+                                }
+                                await FirebaseDatabase.instance
+                                    .ref("classContent/$classContentCount")
+                                    .set(widget.content);
+                                await FirebaseDatabase.instance
+                                    .ref("classContent/contentCount")
+                                    .set("${classContentCount + 1}");
+
+                                String contentPath =
+                                    "classContent/$classContentCount";
+
                                 PostModel post = PostModel(
                                   id: "$id",
                                   contentType: widget.contentType,
@@ -201,9 +229,10 @@ class _PublishPostState extends State<PublishPost> {
                                   topicId: widget.id,
                                   title: titleController.text,
                                   img: imgUrl!,
-                                  owner: owner,
+                                  owner: owner!,
+                                  ownerName: accuntInfo.name.value,
                                   description: descriptionController.text,
-                                  content: widget.content,
+                                  content: contentPath,
                                   likeCount: "0",
                                   likes: Likes(
                                     likeId: LikeId(
@@ -234,16 +263,36 @@ class _PublishPostState extends State<PublishPost> {
                                       classCountData.value.toString());
                                 }
 
-                                Map<String, dynamic> map = post.toMap();
+                                Map<String, dynamic> postDataMap = post.toMap();
                                 var ref = FirebaseDatabase.instance
                                     .ref("/contents/$id/$classCount");
 
-                                await ref.set(map);
+                                await ref.set(postDataMap);
                                 ref = FirebaseDatabase.instance
                                     .ref("/contents/$id/classCount");
                                 ref.set(
                                   "${(classCount + 1)}",
                                 );
+
+                                // update user Data
+                                final user = FirebaseAuth.instance.currentUser!;
+                                final userRef = FirebaseFirestore.instance
+                                    .collection('user')
+                                    .doc(user.email);
+                                final userData = await userRef.get();
+
+                                AccountModel accountModel = AccountModel(
+                                  userName: userData['userName'],
+                                  userEmail: userData['userEmail'],
+                                  img: userData['img'],
+                                  posts: userData['posts'],
+                                  followers: userData['followers'],
+                                );
+                                accuntInfo.posts
+                                    .add("/contents/$id/$classCount");
+
+                                userRef.update(accountModel.toJson());
+
                                 controller.loadingIconOnUploadeTopics.value =
                                     const SizedBox(
                                   child: Text("Uploaded Successfully"),
