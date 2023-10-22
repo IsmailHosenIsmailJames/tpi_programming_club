@@ -67,7 +67,7 @@ class PostModel {
         "owner": owner,
         "description": description,
         "content": content,
-        "like_count": likeCount,
+        "likeCount": likeCount,
         "likes": likes.toMap(),
         "commentsCount": commentsCount,
         "comments": comments.toMap(),

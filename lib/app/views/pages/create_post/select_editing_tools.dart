@@ -156,7 +156,7 @@ class _SelectEditingToolsState extends State<SelectEditingTools> {
                               ),
                             ),
                             onPressed: () {
-                              Get.to(() => MyAppfloyEditor(
+                              Get.to(() => MyQuillHtmlEditor(
                                     name: widget.name,
                                     id: widget.id,
                                   ));

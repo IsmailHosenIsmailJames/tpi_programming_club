@@ -76,15 +76,11 @@ class _PublishPostState extends State<PublishPost> {
                     child: LoadingAnimationWidget.staggeredDotsWave(
                         color: Colors.white, size: 40),
                   );
-                  final count = await FirebaseDatabase.instance
-                      .ref("/contents/count/")
-                      .get();
-                  int id = 0;
-                  if (count.value != null) {
-                    id = int.parse(count.value.toString());
-                  }
+
+                  int id = int.parse(widget.id);
+
                   PickPhotoFileWithUrlMobile img =
-                      await pickPhotoMobile("/contents/$id");
+                      await pickPhotoMobile("/contents/$id/");
                   if (img.imageFile != null) {
                     controller.imageWidget.value = SizedBox(
                       child: Image.file(img.imageFile!, fit: BoxFit.cover),
@@ -183,13 +179,14 @@ class _PublishPostState extends State<PublishPost> {
                             minimumSize: const Size(double.infinity, 50),
                           ),
                           onPressed: () async {
-                            controller.loadingIconOnUploadeTopics.value =
-                                SizedBox(
-                              child: LoadingAnimationWidget.staggeredDotsWave(
-                                  color: Colors.white, size: 40),
-                            );
                             if (validationKey.currentState!.validate()) {
                               if (imgUrl != null) {
+                                controller.loadingIconOnUploadeTopics.value =
+                                    SizedBox(
+                                  child:
+                                      LoadingAnimationWidget.staggeredDotsWave(
+                                          color: Colors.white, size: 40),
+                                );
                                 final count = await FirebaseDatabase.instance
                                     .ref("/contents/count/")
                                     .get();
@@ -199,7 +196,7 @@ class _PublishPostState extends State<PublishPost> {
                                 }
                                 PostModel post = PostModel(
                                   id: "$id",
-                                  contentType: widget.content,
+                                  contentType: widget.contentType,
                                   topic: widget.name,
                                   topicId: widget.id,
                                   title: titleController.text,
@@ -210,32 +207,46 @@ class _PublishPostState extends State<PublishPost> {
                                   likeCount: "0",
                                   likes: Likes(
                                     likeId: LikeId(
-                                      email: owner,
-                                      date: "date",
+                                      email: "null",
+                                      date: "null",
                                     ),
                                   ),
                                   commentsCount: "0",
                                   comments: Comments(
                                     commentId: CommentId(
-                                      email: owner,
-                                      date: "date",
-                                      message: "message",
+                                      email: "null",
+                                      date: "null",
+                                      message: "null",
                                     ),
                                   ),
                                   share: "0",
                                   impression: "0",
                                 );
-                                var ref = FirebaseDatabase.instance
-                                    .ref("/contents/$id");
+
+                                int classCount = 0;
+                                var classCountData = await FirebaseDatabase
+                                    .instance
+                                    .ref("/contents/$id/classCount")
+                                    .get();
+
+                                if (classCountData.exists) {
+                                  classCount = int.parse(
+                                      classCountData.value.toString());
+                                }
+
                                 Map<String, dynamic> map = post.toMap();
-                                map.remove("likes");
-                                map.remove("comments");
+                                var ref = FirebaseDatabase.instance
+                                    .ref("/contents/$id/$classCount");
 
                                 await ref.set(map);
                                 ref = FirebaseDatabase.instance
-                                    .ref("/contents/count");
+                                    .ref("/contents/$id/classCount");
                                 ref.set(
-                                  "${(id + 1)}",
+                                  "${(classCount + 1)}",
+                                );
+                                controller.loadingIconOnUploadeTopics.value =
+                                    const SizedBox(
+                                  child: Text("Uploaded Successfully"),
                                 );
 
                                 Get.to(() => const SelectTopics());
@@ -257,10 +268,6 @@ class _PublishPostState extends State<PublishPost> {
                                 );
                               }
                             }
-                            controller.loadingIconOnUploadeTopics.value =
-                                const SizedBox(
-                              child: Text("Uploaded Successfully"),
-                            );
                           },
                           child: controller.loadingIconOnUploadeTopics.value,
                         ),

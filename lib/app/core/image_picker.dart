@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -32,7 +33,18 @@ Future<PickPhotoFileWithUrlMobile> pickPhotoMobile(String toUploadePath) async {
     String? extension = tem.extension;
     imageFile = File(tem.path!);
 
-    String uploadePath = "$toUploadePath.$extension";
+    int randValue = Random().nextInt(1000000);
+    String imageName = "";
+    if (tem.path != null) {
+      imageName = tem.path!;
+      List<String> l = imageName.split('/');
+      imageName = l[l.length - 2];
+      if (imageName.length > 15) {
+        imageName = imageName.substring(0, 15);
+      }
+    }
+
+    String uploadePath = "$toUploadePath$randValue$imageName.$extension";
     final ref = FirebaseStorage.instance.ref().child(uploadePath);
     UploadTask uploadTask;
     uploadTask = ref.putFile(imageFile);

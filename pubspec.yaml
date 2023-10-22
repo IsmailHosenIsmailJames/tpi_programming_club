@@ -58,6 +58,7 @@ dependencies:
   font_awesome_flutter: ^10.5.0
   appflowy_editor: ^1.4.4
   quill_html_editor: ^2.2.6
+  markdown: ^7.1.1
 
 dev_dependencies:
   flutter_test:

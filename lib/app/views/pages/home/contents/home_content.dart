@@ -60,8 +60,9 @@ class _HomePageContentState extends State<HomePageContent> {
           try {
             var box = Hive.box("tpi_programming_club");
             int count = int.parse(box.get("/contents/topics/count/"));
+            print("No Internet");
 
-            for (var i = 1; i < count + 1; i++) {
+            for (var i = 0; i < count; i++) {
               var topic = box.get("/contents/topics/$i/", defaultValue: null);
               if (topic != null) {
                 TopicsModel obj =
@@ -72,10 +73,6 @@ class _HomePageContentState extends State<HomePageContent> {
           } catch (e) {
             print(e);
           }
-          return Center(
-            child: LoadingAnimationWidget.staggeredDotsWave(
-                color: Colors.blue, size: 40),
-          );
         }
 
         if (listOfTopics.isNotEmpty) {

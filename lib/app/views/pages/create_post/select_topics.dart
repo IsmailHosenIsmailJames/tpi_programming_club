@@ -69,7 +69,7 @@ class _SelectTopicsState extends State<SelectTopics> {
               var box = Hive.box("tpi_programming_club");
               int count = int.parse(box.get("/contents/topics/count/"));
 
-              for (var i = 1; i < count + 1; i++) {
+              for (var i = 0; i < count; i++) {
                 var topic = box.get("/contents/topics/$i/");
                 if (topic != null) {
                   TopicsModel obj =
