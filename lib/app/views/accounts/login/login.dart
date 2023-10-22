@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:tpi_programming_club/app/views/accounts/account_get_controller.dart';
 
 import '../../../themes/const_theme_data.dart';
 import '../../../themes/app_theme_data.dart';
@@ -21,20 +23,20 @@ class _LogInState extends State<LogIn> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   final validationKey = GlobalKey<FormState>();
+  final AccountGetController accountGetController =
+      Get.put(AccountGetController());
 
   void logIn() async {
     if (validationKey.currentState!.validate()) {
+      accountGetController.signUp.value = Center(
+        child: LoadingAnimationWidget.staggeredDotsWave(
+            color: Colors.blue, size: 40),
+      );
       // TO DO : login on firebase
       try {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: email.text.trim(), password: password.text);
-        // ignore: use_build_context_synchronously
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const InIt(),
-            ),
-            (route) => false);
+        Get.offAll(() => const InIt());
       } on FirebaseAuthException catch (e) {
         Fluttertoast.showToast(
           msg: e.message!,
@@ -44,6 +46,12 @@ class _LogInState extends State<LogIn> {
           timeInSecForIosWeb: 5,
         );
       }
+      accountGetController.login.value = const Center(
+        child: Text(
+          "LogIn Successful",
+          style: TextStyle(fontSize: 26, color: Colors.white),
+        ),
+      );
     }
   }
 
@@ -125,7 +133,7 @@ class _LogInState extends State<LogIn> {
                             if (EmailValidator.validate(value!)) {
                               return null;
                             } else {
-                              return "আপনার ইমেইলটি সঠিক নয় ...";
+                              return "Your email is not correct...";
                             }
                           },
                           controller: email,
@@ -138,7 +146,7 @@ class _LogInState extends State<LogIn> {
                               borderSide: const BorderSide(width: 3),
                             ),
                             labelText: "Email",
-                            hintText: "আপনার ইমেইলটি এখানে লিখুন ...",
+                            hintText: "Type your email here...",
                           ),
                         ),
                         const SizedBox(
@@ -152,7 +160,7 @@ class _LogInState extends State<LogIn> {
                             if (value!.length >= 8) {
                               return null;
                             } else {
-                              return "পাসওয়ার্ড সর্বনিম্ন ৮ সংখ্যার হতে হবে ...";
+                              return "Password leangth should be at least 8...";
                             }
                           },
                           controller: password,
@@ -165,27 +173,27 @@ class _LogInState extends State<LogIn> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             labelText: "Password",
-                            hintText: "আপনার পাসওয়ার্ড এখানে লিখুন ...",
+                            hintText: "Type your password here...",
                           ),
                         ),
                         const SizedBox(
                           height: 15,
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
+                        Obx(
+                          () => ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              maximumSize: const Size(380, 50),
+                              minimumSize: const Size(380, 50),
+                              backgroundColor:
+                                  ConstantThemeData().primaryColour,
                             ),
-                            maximumSize: const Size(380, 50),
-                            minimumSize: const Size(380, 50),
-                            backgroundColor: ConstantThemeData().primaryColour,
-                          ),
-                          onPressed: () {
-                            logIn();
-                          },
-                          child: const Text(
-                            "LogIn",
-                            style: TextStyle(fontSize: 26, color: Colors.white),
+                            onPressed: () {
+                              logIn();
+                            },
+                            child: accountGetController.login.value,
                           ),
                         ),
                         const SizedBox(

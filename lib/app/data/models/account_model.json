@@ -1,0 +1,13 @@
+{
+    "userName":"userName",
+    "userEmail":"userEmail",
+    "img":"img",
+    "postCount":"0",
+    "posts":{
+        "null":"null"
+    },
+    "followerCount":"0",
+    "followers":{
+        "null":"null"
+    }
+}

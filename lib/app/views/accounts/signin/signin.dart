@@ -1,9 +1,12 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:tpi_programming_club/app/data/models/account_model.dart';
+import 'package:tpi_programming_club/app/views/accounts/account_get_controller.dart';
 
 import '../../../themes/app_theme_data.dart';
 import '../../../themes/const_theme_data.dart';
@@ -26,18 +29,33 @@ class _SignInState extends State<SignIn> {
   FocusNode passwordFocusNode = FocusNode();
   FocusNode emailFocusNode = FocusNode();
   FocusNode confirmFocusNode = FocusNode();
+  final AccountGetController accountGetController =
+      Get.put(AccountGetController());
 
   void signUp() async {
     if (signUpValidationKey.currentState!.validate()) {
+      accountGetController.signUp.value = Center(
+        child: LoadingAnimationWidget.staggeredDotsWave(
+            color: Colors.blue, size: 40),
+      );
       // TO DO : sign in with email and password and store data on firestore
       try {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: email.text.trim(), password: password.text);
-        await FirebaseDatabase.instance
-            .ref(
-                '/userData/name/${email.text.replaceAll('.', ",").replaceAll("@", "")}/')
-            .set(name.text);
-        Get.offAll(const InIt());
+        AccountModel model = AccountModel(
+          userName: name.text.trim(),
+          userEmail: email.text.trim(),
+          img: "null",
+          postCount: "0",
+          posts: Posts(path: "null"),
+          followerCount: "0",
+          followers: Followers(email: "null"),
+        );
+        await FirebaseFirestore.instance
+            .collection("user/")
+            .doc(email.text.trim())
+            .set(model.toJson());
+        Get.offAll(() => const InIt());
       } on FirebaseAuthException catch (e) {
         Fluttertoast.showToast(
           msg: e.message!,
@@ -47,6 +65,12 @@ class _SignInState extends State<SignIn> {
           timeInSecForIosWeb: 5,
         );
       }
+      accountGetController.signUp.value = const Center(
+        child: Text(
+          "Sign Up Successful",
+          style: TextStyle(fontSize: 26, color: Colors.white),
+        ),
+      );
     }
   }
 
@@ -127,7 +151,7 @@ class _SignInState extends State<SignIn> {
                             if (value!.length >= 3) {
                               return null;
                             } else {
-                              return "আপনার নামটি সঠিক নয় ...";
+                              return "Your name is not correct...";
                             }
                           },
                           controller: name,
@@ -140,7 +164,7 @@ class _SignInState extends State<SignIn> {
                               borderSide: const BorderSide(width: 3),
                             ),
                             labelText: "Name",
-                            hintText: "আপনার নামটি এখানে লিখুন ...",
+                            hintText: "Type your name here...",
                           ),
                         ),
                         const SizedBox(
@@ -155,7 +179,7 @@ class _SignInState extends State<SignIn> {
                             if (EmailValidator.validate(value!)) {
                               return null;
                             } else {
-                              return "আপনার ইমেইলটি সঠিক নয় ...";
+                              return "Your email is not correct...";
                             }
                           },
                           focusNode: emailFocusNode,
@@ -169,7 +193,7 @@ class _SignInState extends State<SignIn> {
                               borderSide: const BorderSide(width: 3),
                             ),
                             labelText: "Email",
-                            hintText: "আপনার ইমেইলটি এখানে লিখুন ...",
+                            hintText: "Type your email here...",
                           ),
                         ),
                         const SizedBox(
@@ -184,7 +208,7 @@ class _SignInState extends State<SignIn> {
                             if (value!.length >= 8) {
                               return null;
                             } else {
-                              return "পাসওয়ার্ড সর্বনিম্ন ৮ সংখ্যার হতে হবে ...";
+                              return "Password leangth should be at least 8...";
                             }
                           },
                           controller: password,
@@ -198,7 +222,7 @@ class _SignInState extends State<SignIn> {
                               borderSide: const BorderSide(width: 3),
                             ),
                             labelText: "Password",
-                            hintText: "আপনার পাসওয়ার্ড এখানে লিখুন ...",
+                            hintText: "Type your password here...",
                           ),
                         ),
                         const SizedBox(
@@ -213,7 +237,7 @@ class _SignInState extends State<SignIn> {
                                 password.text != "") {
                               return null;
                             } else {
-                              return "পাসওয়ার্ড সর্বনিম্ন ৮ সংখ্যার হতে হবে ...";
+                              return "Password leangth should be at least 8...";
                             }
                           },
                           controller: confirmPass,
@@ -227,27 +251,27 @@ class _SignInState extends State<SignIn> {
                               borderSide: const BorderSide(width: 3),
                             ),
                             labelText: "Confirm Password",
-                            hintText: "আপনার পাসওয়ার্ড এখানে লিখুন ...",
+                            hintText: "Type your password here again...",
                           ),
                         ),
                         const SizedBox(
                           height: 15,
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
+                        Obx(
+                          () => ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              maximumSize: const Size(380, 50),
+                              minimumSize: const Size(380, 50),
+                              backgroundColor:
+                                  ConstantThemeData().primaryColour,
                             ),
-                            maximumSize: const Size(380, 50),
-                            minimumSize: const Size(380, 50),
-                            backgroundColor: ConstantThemeData().primaryColour,
-                          ),
-                          onPressed: () {
-                            signUp();
-                          },
-                          child: const Text(
-                            "Sign Up",
-                            style: TextStyle(fontSize: 26, color: Colors.white),
+                            onPressed: () {
+                              signUp();
+                            },
+                            child: accountGetController.signUp.value,
                           ),
                         ),
                         const SizedBox(
