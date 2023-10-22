@@ -12,7 +12,7 @@ import 'package:tpi_programming_club/app/views/pages/create_post/create_topics.d
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 
 import '../../../themes/app_theme_data.dart';
-import '../home/contents/topics_model.dart';
+import '../../../data/models/topics_model.dart';
 import 'select_editing_tools.dart';
 
 class SelectTopics extends StatefulWidget {

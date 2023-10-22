@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/core/image_picker.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
-import 'package:tpi_programming_club/app/views/pages/home/contents/topics_model.dart';
+import 'package:tpi_programming_club/app/data/models/topics_model.dart';
 
 import 'getx_create_post_controller.dart';
 import 'select_topics.dart';

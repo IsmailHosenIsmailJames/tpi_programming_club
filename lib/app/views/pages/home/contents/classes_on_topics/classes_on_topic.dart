@@ -11,7 +11,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/views/pages/home/contents/classes_on_topics/single_class_post.dart';
 
 import '../../../../../themes/app_theme_data.dart';
-import '../../../create_post/publish/post_models.dart';
+import '../../../../../data/models/post_models.dart';
 import '../../../drawer/drawer.dart';
 
 class ClassesOnTopics extends StatefulWidget {

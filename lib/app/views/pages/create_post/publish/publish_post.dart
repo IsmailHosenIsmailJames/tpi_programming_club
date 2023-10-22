@@ -2,7 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:tpi_programming_club/app/views/pages/create_post/publish/post_models.dart';
+import 'package:tpi_programming_club/app/data/models/post_models.dart';
 import 'package:tpi_programming_club/app/views/pages/create_post/select_topics.dart';
 
 import '../../../../core/image_picker.dart';
