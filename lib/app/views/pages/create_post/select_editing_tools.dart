@@ -156,13 +156,13 @@ class _SelectEditingToolsState extends State<SelectEditingTools> {
                               ),
                             ),
                             onPressed: () {
-                              Get.to(() => MyQuillHtmlEditor(
+                              Get.to(() => MyQuillEditor(
                                     name: widget.name,
                                     id: widget.id,
                                   ));
                             },
                             child: const Text(
-                              "AppFlowy",
+                              "Quill Editor",
                               style: TextStyle(
                                 fontSize: 32,
                               ),
@@ -173,10 +173,10 @@ class _SelectEditingToolsState extends State<SelectEditingTools> {
                           ),
                           IconButton(
                             onPressed: () async {
-                              if (!await launchUrl(
-                                  Uri.parse("https://appflowy.io/"))) {
+                              if (!await launchUrl(Uri.parse(
+                                  "https://github.com/singerdmx/flutter-quill"))) {
                                 throw Exception(
-                                    'Could not launch https://appflowy.io/');
+                                    'Could not launch https://github.com/singerdmx/flutter-quill');
                               }
                             },
                             icon: const Icon(
