@@ -9,6 +9,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/core/image_picker.dart';
 import 'package:tpi_programming_club/app/core/show_toast_meassage.dart';
 import 'package:tpi_programming_club/app/views/pages/create_post/quill_editor/code/edit_code.dart';
+import 'package:tpi_programming_club/app/views/pages/create_post/quill_editor/preview_of_post_quill.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
@@ -500,10 +501,35 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
           widget.name,
         ),
         actions: [
+          ElevatedButton(
+            onPressed: () {
+              if (quillEditorController.document.toPlainText() != "\n") {
+                addQuillDataToPost(
+                  quillEditorController.document.toDelta().toJson(),
+                );
+                quillEditorController.clear();
+              }
+
+              Get.to(
+                () => PreViewOfPostQuill(
+                  name: widget.name,
+                  id: widget.id,
+                  postData: postData,
+                ),
+              );
+            },
+            child: const Text("Preview"),
+          ),
           PopupMenuButton(
             itemBuilder: (context) => [
               PopupMenuItem(
                 onTap: () async {
+                  if (quillEditorController.document.toPlainText() != "\n") {
+                    addQuillDataToPost(
+                      quillEditorController.document.toDelta().toJson(),
+                    );
+                    quillEditorController.clear();
+                  }
                   PickPhotoFileWithUrlMobile imgData =
                       await pickPhotoMobile("contents/${widget.id}/");
                   if (imgData.url != null) {
@@ -531,6 +557,12 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
               ),
               PopupMenuItem(
                 onTap: () async {
+                  if (quillEditorController.document.toPlainText() != "\n") {
+                    addQuillDataToPost(
+                      quillEditorController.document.toDelta().toJson(),
+                    );
+                    quillEditorController.clear();
+                  }
                   final result = await Get.to(
                     () => const AddCodeToPost(
                       language: "language",
@@ -566,6 +598,12 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
               ),
               PopupMenuItem(
                 onTap: () {
+                  if (quillEditorController.document.toPlainText() != "\n") {
+                    addQuillDataToPost(
+                      quillEditorController.document.toDelta().toJson(),
+                    );
+                    quillEditorController.clear();
+                  }
                   TextEditingController inputController =
                       TextEditingController();
                   showModalBottomSheet(
@@ -663,9 +701,13 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
                     child: const Icon(Icons.add),
                     tooltip: "Add this data to post",
                     onTap: () {
-                      addQuillDataToPost(
-                        quillEditorController.document.toDelta().toJson(),
-                      );
+                      if (quillEditorController.document.toPlainText() !=
+                          "\n") {
+                        addQuillDataToPost(
+                          quillEditorController.document.toDelta().toJson(),
+                        );
+                        quillEditorController.clear();
+                      }
                     },
                   ),
                 ],

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
-import 'package:tpi_programming_club/app/views/pages/create_post/publish/publish_post.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../publish_post.dart';
 
 class MarkDownOutPut extends StatefulWidget {
   final String markdown;

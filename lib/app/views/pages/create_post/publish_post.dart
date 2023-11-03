@@ -3,15 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:tpi_programming_club/app/data/models/post_models.dart';
+import 'package:tpi_programming_club/app/core/image_picker.dart';
 import 'package:tpi_programming_club/app/views/accounts/account_info_controller.dart';
-import 'package:tpi_programming_club/app/views/pages/create_post/select_topics.dart';
+import 'package:tpi_programming_club/app/views/pages/home/home.dart';
 
-import '../../../../core/image_picker.dart';
-import '../../../../data/models/account_model.dart';
-import '../../drawer/drawer.dart';
-import '../getx_create_post_controller.dart';
+import '../../../data/models/account_model.dart';
+import '../../../data/models/post_models.dart';
+import 'getx_create_post_controller.dart';
 
 class PublishPost extends StatefulWidget {
   const PublishPost(
@@ -39,153 +39,159 @@ class _PublishPostState extends State<PublishPost> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  String? imgUrl;
+  String imgUrl = "null";
   String? title;
   String? description;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Uploade Post"),
-      ),
-      drawer: const HomeDrawer(),
-      body: Center(
-        child: SingleChildScrollView(
-          reverse: true,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Obx(
-                () => Container(
-                  height: 200,
-                  width: 200,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(83, 33, 149, 243),
-                    borderRadius: BorderRadius.circular(15),
+      appBar: AppBar(),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            reverse: true,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Text(
+                    "We need some infomation about this post. Proper and detailed infromation will help your post to get by search easily. We also recommand to upload a photo that is releted with this post.",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.firaMono(
+                      color: Colors.white,
+                      textStyle: Theme.of(context).textTheme.bodyLarge,
+                    ),
                   ),
-                  child: controller.imageWidget.value,
                 ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100),
+                Obx(
+                  () => Container(
+                    height: 200,
+                    width: 200,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(83, 33, 149, 243),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: controller.imageWidget.value,
                   ),
-                  minimumSize: const Size(200, 35),
                 ),
-                onPressed: () async {
-                  controller.loadingIconOnUploadeImage.value = SizedBox(
-                    child: LoadingAnimationWidget.staggeredDotsWave(
-                        color: Colors.white, size: 40),
-                  );
-
-                  int id = int.parse(widget.id);
-
-                  PickPhotoFileWithUrlMobile img =
-                      await pickPhotoMobile("/contents/$id/");
-                  if (img.imageFile != null) {
-                    controller.imageWidget.value = SizedBox(
-                      child: Image.file(img.imageFile!, fit: BoxFit.cover),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    minimumSize: const Size(200, 35),
+                  ),
+                  onPressed: () async {
+                    controller.loadingIconOnUploadeImage.value = SizedBox(
+                      child: LoadingAnimationWidget.staggeredDotsWave(
+                          color: Colors.white, size: 40),
                     );
-                  }
-                  if (img.url != null) {
-                    imgUrl = img.url;
-                  }
-                  controller.loadingIconOnUploadeImage.value = const SizedBox(
-                    child: Text("Choice an Image"),
-                  );
-                },
-                child: Obx(
-                  () => controller.loadingIconOnUploadeImage.value,
+
+                    int id = int.parse(widget.id);
+
+                    PickPhotoFileWithUrlMobile img =
+                        await pickPhotoMobile("/contents/$id/");
+                    if (img.imageFile != null) {
+                      controller.imageWidget.value = SizedBox(
+                        child: Image.file(img.imageFile!, fit: BoxFit.cover),
+                      );
+                    }
+                    if (img.url != null) {
+                      imgUrl = img.url!;
+                    }
+                    controller.loadingIconOnUploadeImage.value = const SizedBox(
+                      child: Text("Choice an Image"),
+                    );
+                  },
+                  child: Obx(
+                    () => controller.loadingIconOnUploadeImage.value,
+                  ),
                 ),
-              ),
-              Form(
-                key: validationKey,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 10, left: 20, right: 20, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      TextFormField(
-                        controller: titleController,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (value) {
-                          if (value!.isNotEmpty) {
-                            return null;
-                          } else {
-                            return "Too short description";
-                          }
-                        },
-                        decoration: InputDecoration(
-                          suffix: GestureDetector(
-                            child: const Icon(
-                              Icons.info,
-                              size: 16,
-                              color: Colors.blue,
+                Form(
+                  key: validationKey,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 10, left: 20, right: 20, bottom: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextFormField(
+                          controller: titleController,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value!.isNotEmpty) {
+                              return null;
+                            } else {
+                              return "Too short description";
+                            }
+                          },
+                          decoration: InputDecoration(
+                            suffix: GestureDetector(
+                              child: const Icon(
+                                Icons.info,
+                                size: 16,
+                                color: Colors.blue,
+                              ),
                             ),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          hintText: "Type your topic's title",
-                          labelText: "Title",
-                          labelStyle:
-                              const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      TextFormField(
-                        controller: descriptionController,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        maxLines: null,
-                        validator: (value) {
-                          if (value!.length > 20) {
-                            return null;
-                          } else {
-                            return "Too short description";
-                          }
-                        },
-                        keyboardType: TextInputType.multiline,
-                        decoration: InputDecoration(
-                          suffix: GestureDetector(
-                            child: const Icon(
-                              Icons.info,
-                              size: 16,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          hintText: "Type your topic's description",
-                          labelText: "Description",
-                          labelStyle: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      Obx(
-                        () => ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
+                            border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            minimumSize: const Size(double.infinity, 50),
+                            hintText: "Type your topic's title",
+                            labelText: "Title",
+                            labelStyle:
+                                const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          onPressed: () async {
-                            if (validationKey.currentState!.validate()) {
-                              if (imgUrl != null) {
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        TextFormField(
+                          controller: descriptionController,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          maxLines: null,
+                          validator: (value) {
+                            if (value!.length > 20) {
+                              return null;
+                            } else {
+                              return "Too short description";
+                            }
+                          },
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            suffix: GestureDetector(
+                              child: const Icon(
+                                Icons.info,
+                                size: 16,
+                                color: Colors.blue,
+                              ),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            hintText: "Type your topic's description",
+                            labelText: "Description",
+                            labelStyle: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Obx(
+                          () => ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              minimumSize: const Size(double.infinity, 50),
+                            ),
+                            onPressed: () async {
+                              if (validationKey.currentState!.validate()) {
                                 controller.loadingIconOnUploadeTopics.value =
                                     SizedBox(
                                   child:
@@ -228,7 +234,7 @@ class _PublishPostState extends State<PublishPost> {
                                   topic: widget.name,
                                   topicId: widget.id,
                                   title: titleController.text,
-                                  img: imgUrl!,
+                                  img: imgUrl,
                                   owner: owner!,
                                   ownerName: accuntInfo.name.value,
                                   description: descriptionController.text,
@@ -295,10 +301,10 @@ class _PublishPostState extends State<PublishPost> {
 
                                 controller.loadingIconOnUploadeTopics.value =
                                     const SizedBox(
-                                  child: Text("Uploaded Successfully"),
+                                  child: Text("Uploaded"),
                                 );
 
-                                Get.to(() => const SelectTopics());
+                                Get.to(() => const HomePage());
 
                                 // ignore: use_build_context_synchronously
                                 showDialog<String>(
@@ -316,16 +322,16 @@ class _PublishPostState extends State<PublishPost> {
                                   ),
                                 );
                               }
-                            }
-                          },
-                          child: controller.loadingIconOnUploadeTopics.value,
+                            },
+                            child: controller.loadingIconOnUploadeTopics.value,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

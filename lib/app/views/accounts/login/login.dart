@@ -37,6 +37,9 @@ class _LogInState extends State<LogIn> {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: email.text.trim(), password: password.text);
         Get.offAll(() => const InIt());
+        accountGetController.login.value = const Center(
+          child: Icon(Icons.done),
+        );
       } on FirebaseAuthException catch (e) {
         Fluttertoast.showToast(
           msg: e.message!,
@@ -48,8 +51,8 @@ class _LogInState extends State<LogIn> {
       }
       accountGetController.login.value = const Center(
         child: Text(
-          "LogIn Successful",
-          style: TextStyle(fontSize: 26, color: Colors.white),
+          "LogIn failed, try again",
+          style: TextStyle(fontSize: 20, color: Colors.deepOrange),
         ),
       );
     }

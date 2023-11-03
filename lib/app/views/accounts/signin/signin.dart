@@ -57,6 +57,9 @@ class _SignInState extends State<SignIn> {
 
         await sentValidationEmail();
         Get.offAll(() => const InIt());
+        accountGetController.signUp.value = const Center(
+          child: Icon(Icons.done),
+        );
       } on FirebaseAuthException catch (e) {
         Fluttertoast.showToast(
           msg: e.message!,
@@ -65,13 +68,13 @@ class _SignInState extends State<SignIn> {
           toastLength: Toast.LENGTH_LONG,
           timeInSecForIosWeb: 5,
         );
+        accountGetController.signUp.value = const Center(
+          child: Text(
+            "Signup faild, try again",
+            style: TextStyle(fontSize: 26, color: Colors.deepOrange),
+          ),
+        );
       }
-      accountGetController.signUp.value = const Center(
-        child: Text(
-          "Sign Up Successful",
-          style: TextStyle(fontSize: 26, color: Colors.white),
-        ),
-      );
     }
   }
 
