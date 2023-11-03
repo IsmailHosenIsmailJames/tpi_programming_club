@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -27,6 +28,17 @@ class _SelectEditingToolsState extends State<SelectEditingTools> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            Center(
+              child: Text(
+                "We offer you two types of editor. If you are well know with Markdown language, we recommand Markdown editor. Elase you are recommanded Rich text editor.",
+                style: GoogleFonts.firaMono(
+                    color: Colors.white,
+                    textStyle: Theme.of(context).textTheme.bodyLarge),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
             Padding(
               padding:
                   const EdgeInsets.only(top: 15, left: 8, right: 8, bottom: 15),

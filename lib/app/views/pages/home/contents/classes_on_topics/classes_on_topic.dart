@@ -27,7 +27,9 @@ class ClassesOnTopics extends StatefulWidget {
 class _ClassesOnTopicsState extends State<ClassesOnTopics> {
   Future saveDatabaseResponce(Map<String, dynamic> decodedData) async {
     var box = Hive.box("tpi_programming_club");
-    box.put(widget.path, decodedData);
+    decodedData.forEach((key, value) {
+      box.put("contents/$key", value);
+    });
   }
 
   @override
@@ -72,15 +74,20 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
           } else {
             try {
               var box = Hive.box("tpi_programming_club");
-              var data = box.get(widget.path);
-              if (data != null) {
-                int count = int.parse(data['classCount']);
+              int count = int.parse(box.get("contents/classCount"));
+              print("count is : $count");
 
-                for (var i = 0; i < count; i++) {
-                  if (data['$i'] != null) {
-                    PostModel obj = PostModel.fromMap(Map.from(data['$i']));
-                    listOfTopics.add(obj);
-                  }
+              for (var i = 0; i < count; i++) {
+                var contents = box.get("contents/$i", defaultValue: null);
+                if (contents != null) {
+                  PostModel obj = PostModel.fromJson(
+                    jsonDecode(
+                      jsonEncode(
+                        jsonEncode(contents),
+                      ),
+                    ),
+                  );
+                  listOfTopics.add(obj);
                 }
               }
             } catch (e) {

@@ -24,14 +24,14 @@ class _HomePageContentState extends State<HomePageContent> {
   Future saveDatabaseResponce(Map<String, dynamic> decodedData) async {
     var box = Hive.box("tpi_programming_club");
     decodedData.forEach((key, value) {
-      box.put("/contents/topics/$key/", value);
+      box.put("contents/topics/$key", value);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: FirebaseDatabase.instance.ref().child("/contents/topics/").get(),
+      future: FirebaseDatabase.instance.ref().child("contents/topics").get(),
       builder: (context, snapshot) {
         List<TopicsModel> listOfTopics = [];
         if (snapshot.connectionState == ConnectionState.done) {
@@ -60,10 +60,10 @@ class _HomePageContentState extends State<HomePageContent> {
         } else {
           try {
             var box = Hive.box("tpi_programming_club");
-            int count = int.parse(box.get("/contents/topics/count/"));
+            int count = int.parse(box.get("contents/topics/count"));
 
             for (var i = 0; i < count; i++) {
-              var topic = box.get("/contents/topics/$i/", defaultValue: null);
+              var topic = box.get("contents/topics/$i", defaultValue: null);
               if (topic != null) {
                 TopicsModel obj =
                     TopicsModel.fromJson(jsonDecode(jsonEncode(topic)));
@@ -128,7 +128,7 @@ class _HomePageContentState extends State<HomePageContent> {
                     return GetX<AppThemeData>(
                       builder: (controller) => GestureDetector(
                         onTap: () {
-                          String path = "/contents/${listOfTopics[index].id}";
+                          String path = "contents/${listOfTopics[index].id}";
                           Get.to(
                             ClassesOnTopics(
                               path: path,
