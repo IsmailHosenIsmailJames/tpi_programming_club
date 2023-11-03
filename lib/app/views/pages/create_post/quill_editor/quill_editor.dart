@@ -332,6 +332,7 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
           child: CodeTheme(
             data: CodeThemeData(styles: codeThemeStyle),
             child: CodeField(
+              readOnly: true,
               controller: codeController,
               textStyle: GoogleFonts.firaMono(
                   color: Colors.white,
