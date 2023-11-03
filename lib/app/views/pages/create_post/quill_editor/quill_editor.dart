@@ -35,8 +35,6 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
   List<Map<String, dynamic>> postData = [];
   List<Widget> postPreview = [];
 
-  late List<dynamic> currentQuillControllerData;
-
   void deletePartOfPost(int index) {
     postData.removeAt(index);
     postPreview = createWidget(postData);
@@ -136,342 +134,20 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
     List<Widget> widgetList = [];
     for (var i = 0; i < data.length; i++) {
       final partOfData = data[i];
-
       if (partOfData['type'] == 'quill') {
-        final quillData = partOfData['data'];
-        Widget partOfPost = Row(
-          children: [
-            QuillProvider(
-              configurations: QuillConfigurations(
-                controller: QuillController(
-                  document: Document.fromJson(quillData),
-                  selection:
-                      const TextSelection(baseOffset: 0, extentOffset: 0),
-                ),
-              ),
-              child: Expanded(
-                child: QuillEditor.basic(
-                  configurations: const QuillEditorConfigurations(
-                    readOnly: true,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            Container(
-              margin: const EdgeInsets.all(1),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                color: const Color.fromARGB(99, 72, 202, 76),
-              ),
-              child: PopupMenuButton(
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    onTap: () => editQuillPartOfPost(i),
-                    child: const Row(children: [
-                      Icon(Icons.edit),
-                      SizedBox(
-                        width: 2,
-                      ),
-                      Text("Edit"),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => deletePartOfPost(i),
-                    child: const Row(children: [
-                      Icon(Icons.delete),
-                      SizedBox(
-                        width: 2,
-                      ),
-                      Text("delete"),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => moveUp(i),
-                    child: const Row(children: [
-                      Icon(Icons.arrow_upward),
-                      SizedBox(
-                        width: 2,
-                      ),
-                      Text("Move Up"),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => moveDown(i),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.arrow_downward),
-                        SizedBox(
-                          width: 2,
-                        ),
-                        Text("Move down"),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
-
+        Widget partOfPost = addQuillWidgetDataToPost(partOfData, i);
         widgetList.add(partOfPost);
       } else if (partOfData['type'] == 'code') {
-        var codeThemeStyle = monokaiSublimeTheme;
-        CodeController codeController = CodeController(
-          text: partOfData['data']['code'],
-          patternMap: {
-            r"\B#[a-zA-Z0-9]+\b": const TextStyle(color: Colors.red),
-            r"\B@[a-zA-Z0-9]+\b": const TextStyle(
-              fontWeight: FontWeight.w800,
-              color: Colors.blue,
-            ),
-            r"\B![a-zA-Z0-9]+\b": const TextStyle(
-                color: Colors.yellow, fontStyle: FontStyle.italic),
-          },
-          stringMap: {
-            "bev": const TextStyle(color: Colors.indigo),
-          },
-          language: allLanguages[partOfData['data']['language']],
-        );
-
-        Widget codeWidget = Row(
-          children: [
-            Expanded(
-              child: CodeTheme(
-                data: CodeThemeData(styles: codeThemeStyle),
-                child: CodeField(
-                  controller: codeController,
-                  textStyle: GoogleFonts.firaMono(
-                      color: Colors.white,
-                      textStyle: Theme.of(context).textTheme.bodyLarge),
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.all(1),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                color: const Color.fromARGB(99, 72, 202, 76),
-              ),
-              child: PopupMenuButton(
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    onTap: () async {
-                      final result = await Get.to(
-                        () => AddCodeToPost(
-                          language: partOfData['data']['language'],
-                          codeText: partOfData['data']['code'],
-                        ),
-                      );
-                      if (result != null) {
-                        final codeData = {
-                          "data": result,
-                          "type": "code",
-                        };
-                        postData[i] = codeData;
-                        setState(() {
-                          postData;
-                        });
-                        postPreview = createWidget(postData);
-                        setState(() {
-                          postPreview;
-                        });
-                      }
-                    },
-                    child: const Row(children: [
-                      Icon(Icons.edit),
-                      SizedBox(
-                        width: 2,
-                      ),
-                      Text("Edit"),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => deletePartOfPost(i),
-                    child: const Row(children: [
-                      Icon(Icons.delete),
-                      SizedBox(
-                        width: 2,
-                      ),
-                      Text("delete"),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => moveUp(i),
-                    child: const Row(children: [
-                      Icon(Icons.arrow_upward),
-                      SizedBox(
-                        width: 2,
-                      ),
-                      Text("Move Up"),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => moveDown(i),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.arrow_downward),
-                        SizedBox(
-                          width: 2,
-                        ),
-                        Text("Move down"),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
+        Widget codeWidget = addCodeWidgetToPost(partOfData, i);
         widgetList.add(codeWidget);
       } else if (partOfData['type'] == "img") {
-        Widget imgWidget = Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: const Color.fromARGB(80, 113, 113, 113),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: CachedNetworkImage(
-                  imageUrl: partOfData['data'],
-                  fit: BoxFit.scaleDown,
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      Center(
-                    child: LoadingAnimationWidget.staggeredDotsWave(
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.all(1),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                color: const Color.fromARGB(99, 72, 202, 76),
-              ),
-              child: PopupMenuButton(
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    onTap: () => deletePartOfPost(i),
-                    child: const Row(children: [
-                      Icon(Icons.delete),
-                      SizedBox(
-                        width: 2,
-                      ),
-                      Text("delete"),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => moveUp(i),
-                    child: const Row(children: [
-                      Icon(Icons.arrow_upward),
-                      SizedBox(
-                        width: 2,
-                      ),
-                      Text("Move Up"),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => moveDown(i),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.arrow_downward),
-                        SizedBox(
-                          width: 2,
-                        ),
-                        Text("Move down"),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
+        Widget imgWidget = addImageDataToPost(partOfData, i);
         widgetList.add(imgWidget);
       } else if (partOfData['type'] == 'youtube') {
         String url = partOfData['data'];
         String? videoID = YoutubePlayer.convertUrlToId(url);
         if (videoID != null) {
-          YoutubePlayerController controller = YoutubePlayerController(
-            initialVideoId: videoID,
-            flags: const YoutubePlayerFlags(
-              autoPlay: false,
-              hideControls: false,
-            ),
-          );
-
-          Widget youtubeWidget = Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: const Color.fromARGB(80, 113, 113, 113),
-                ),
-                child: YoutubePlayer(
-                  controller: controller,
-                  showVideoProgressIndicator: true,
-                  progressColors: const ProgressBarColors(
-                    playedColor: Colors.blue,
-                    handleColor: Colors.green,
-                  ),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.all(1),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: const Color.fromARGB(99, 72, 202, 76),
-                ),
-                child: PopupMenuButton(
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      onTap: () => deletePartOfPost(i),
-                      child: const Row(children: [
-                        Icon(Icons.delete),
-                        SizedBox(
-                          width: 2,
-                        ),
-                        Text("delete"),
-                      ]),
-                    ),
-                    PopupMenuItem(
-                      onTap: () => moveUp(i),
-                      child: const Row(children: [
-                        Icon(Icons.arrow_upward),
-                        SizedBox(
-                          width: 2,
-                        ),
-                        Text("Move Up"),
-                      ]),
-                    ),
-                    PopupMenuItem(
-                      onTap: () => moveDown(i),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.arrow_downward),
-                          SizedBox(
-                            width: 2,
-                          ),
-                          Text("Move down"),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-
+          Widget youtubeWidget = addYoutubeVideoWidget(videoID, i);
           widgetList.add(youtubeWidget);
         }
       }
@@ -479,8 +155,341 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
     return widgetList;
   }
 
-  void addImageDataToPost() {}
-  void addCodeToPost() {}
+  Widget addQuillWidgetDataToPost(Map<String, dynamic> partOfData, int i) {
+    final quillData = partOfData['data'];
+    return Row(
+      children: [
+        QuillProvider(
+          configurations: QuillConfigurations(
+            controller: QuillController(
+              document: Document.fromJson(quillData),
+              selection: const TextSelection(baseOffset: 0, extentOffset: 0),
+            ),
+          ),
+          child: Expanded(
+            child: QuillEditor.basic(
+              configurations: const QuillEditorConfigurations(
+                readOnly: true,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        Container(
+          margin: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            color: const Color.fromARGB(99, 72, 202, 76),
+          ),
+          child: PopupMenuButton(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                onTap: () => editQuillPartOfPost(i),
+                child: const Row(children: [
+                  Icon(Icons.edit),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("Edit"),
+                ]),
+              ),
+              PopupMenuItem(
+                onTap: () => deletePartOfPost(i),
+                child: const Row(children: [
+                  Icon(Icons.delete),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("delete"),
+                ]),
+              ),
+              PopupMenuItem(
+                onTap: () => moveUp(i),
+                child: const Row(children: [
+                  Icon(Icons.arrow_upward),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("Move Up"),
+                ]),
+              ),
+              PopupMenuItem(
+                onTap: () => moveDown(i),
+                child: const Row(
+                  children: [
+                    Icon(Icons.arrow_downward),
+                    SizedBox(
+                      width: 2,
+                    ),
+                    Text("Move down"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget addImageDataToPost(Map<String, dynamic> partOfData, int i) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(top: 5, bottom: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color.fromARGB(80, 113, 113, 113),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: CachedNetworkImage(
+              imageUrl: partOfData['data'],
+              fit: BoxFit.scaleDown,
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  Center(
+                child: LoadingAnimationWidget.staggeredDotsWave(
+                  color: Colors.white,
+                  size: 40,
+                ),
+              ),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            ),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            color: const Color.fromARGB(99, 72, 202, 76),
+          ),
+          child: PopupMenuButton(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                onTap: () => deletePartOfPost(i),
+                child: const Row(children: [
+                  Icon(Icons.delete),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("delete"),
+                ]),
+              ),
+              PopupMenuItem(
+                onTap: () => moveUp(i),
+                child: const Row(children: [
+                  Icon(Icons.arrow_upward),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("Move Up"),
+                ]),
+              ),
+              PopupMenuItem(
+                onTap: () => moveDown(i),
+                child: const Row(
+                  children: [
+                    Icon(Icons.arrow_downward),
+                    SizedBox(
+                      width: 2,
+                    ),
+                    Text("Move down"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget addCodeWidgetToPost(Map<String, dynamic> partOfData, int i) {
+    var codeThemeStyle = monokaiSublimeTheme;
+    CodeController codeController = CodeController(
+      text: partOfData['data']['code'],
+      patternMap: {
+        r"\B#[a-zA-Z0-9]+\b": const TextStyle(color: Colors.red),
+        r"\B@[a-zA-Z0-9]+\b": const TextStyle(
+          fontWeight: FontWeight.w800,
+          color: Colors.blue,
+        ),
+        r"\B![a-zA-Z0-9]+\b":
+            const TextStyle(color: Colors.yellow, fontStyle: FontStyle.italic),
+      },
+      stringMap: {
+        "bev": const TextStyle(color: Colors.indigo),
+      },
+      language: allLanguages[partOfData['data']['language']],
+    );
+
+    return Row(
+      children: [
+        Expanded(
+          child: CodeTheme(
+            data: CodeThemeData(styles: codeThemeStyle),
+            child: CodeField(
+              controller: codeController,
+              textStyle: GoogleFonts.firaMono(
+                  color: Colors.white,
+                  textStyle: Theme.of(context).textTheme.bodyLarge),
+            ),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            color: const Color.fromARGB(99, 72, 202, 76),
+          ),
+          child: PopupMenuButton(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                onTap: () async {
+                  final result = await Get.to(
+                    () => AddCodeToPost(
+                      language: partOfData['data']['language'],
+                      codeText: partOfData['data']['code'],
+                    ),
+                  );
+                  if (result != null) {
+                    final codeData = {
+                      "data": result,
+                      "type": "code",
+                    };
+                    postData[i] = codeData;
+                    setState(() {
+                      postData;
+                    });
+                    postPreview = createWidget(postData);
+                    setState(() {
+                      postPreview;
+                    });
+                  }
+                },
+                child: const Row(children: [
+                  Icon(Icons.edit),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("Edit"),
+                ]),
+              ),
+              PopupMenuItem(
+                onTap: () => deletePartOfPost(i),
+                child: const Row(children: [
+                  Icon(Icons.delete),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("delete"),
+                ]),
+              ),
+              PopupMenuItem(
+                onTap: () => moveUp(i),
+                child: const Row(children: [
+                  Icon(Icons.arrow_upward),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("Move Up"),
+                ]),
+              ),
+              PopupMenuItem(
+                onTap: () => moveDown(i),
+                child: const Row(
+                  children: [
+                    Icon(Icons.arrow_downward),
+                    SizedBox(
+                      width: 2,
+                    ),
+                    Text("Move down"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget addYoutubeVideoWidget(String videoID, int i) {
+    YoutubePlayerController controller = YoutubePlayerController(
+      initialVideoId: videoID,
+      flags: const YoutubePlayerFlags(
+        autoPlay: false,
+        hideControls: false,
+      ),
+    );
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(top: 5, bottom: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color.fromARGB(80, 113, 113, 113),
+          ),
+          child: YoutubePlayer(
+            controller: controller,
+            showVideoProgressIndicator: true,
+            progressColors: const ProgressBarColors(
+              playedColor: Colors.blue,
+              handleColor: Colors.green,
+            ),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            color: const Color.fromARGB(99, 72, 202, 76),
+          ),
+          child: PopupMenuButton(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                onTap: () => deletePartOfPost(i),
+                child: const Row(children: [
+                  Icon(Icons.delete),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("delete"),
+                ]),
+              ),
+              PopupMenuItem(
+                onTap: () => moveUp(i),
+                child: const Row(children: [
+                  Icon(Icons.arrow_upward),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("Move Up"),
+                ]),
+              ),
+              PopupMenuItem(
+                onTap: () => moveDown(i),
+                child: const Row(
+                  children: [
+                    Icon(Icons.arrow_downward),
+                    SizedBox(
+                      width: 2,
+                    ),
+                    Text("Move down"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
