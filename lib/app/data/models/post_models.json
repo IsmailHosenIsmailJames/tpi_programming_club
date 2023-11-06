@@ -1,26 +1,31 @@
 {
-    "id": "0",
-    "contentType": "contentType",
-    "topic":"topic",
-    "topicId":"topicId",
-    "img": "img",
-    "title": "title",
-    "owner": "owner",
-    "description": "description",
-    "content": "content",
-    "ownerName":"ownerName",
-    "likeCount": "0",
-    "likes": {
-      "likeId": {"email": "email", "date": "date"}
-    },
-    "commentsCount": "commentCount",
-    "comments": {
-      "commentId": {
-        "email": "email",
-        "date": "date",
-        "message": "message"
-      }
-    },
-    "share": "share",
-    "impression": "impression"
-  }
+  "id": "0",
+  "contentType": "contentType",
+  "topic": "topic",
+  "topicId": "topicId",
+  "img": "img",
+  "title": "title",
+  "owner": "owner",
+  "description": "description",
+  "content": "content",
+  "ownerName": "ownerName",
+  "likeCount": "0",
+  "profile": "imgUrl",
+  "likes": {
+    "likeId": {
+      "email": "email",
+      "date": "date"
+    }
+  },
+  "commentsCount": "commentCount",
+  "comments": {
+    "commentId": {
+      "profile": "imgUrl",
+      "email": "email",
+      "date": "date",
+      "message": "message"
+    }
+  },
+  "share": "share",
+  "impression": "impression"
+}

@@ -32,7 +32,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> getAccountInfo() async {
     final user = FirebaseAuth.instance.currentUser!;
-    final ref = FirebaseDatabase.instance.ref('user/${user.email}');
+    final ref = FirebaseDatabase.instance
+        .ref('user/${user.email!.replaceAll('.', ',')}');
     final data = await ref.get();
     if (data.value == null) return;
     final userData = jsonDecode(jsonEncode(data.value));

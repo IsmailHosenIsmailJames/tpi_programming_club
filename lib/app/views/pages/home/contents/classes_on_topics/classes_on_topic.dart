@@ -75,7 +75,6 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
             try {
               var box = Hive.box("tpi_programming_club");
               int count = int.parse(box.get("contents/classCount"));
-              print("count is : $count");
 
               for (var i = 0; i < count; i++) {
                 var contents = box.get("contents/$i", defaultValue: null);
@@ -148,10 +147,9 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
                         builder: (controller) => GestureDetector(
                           onTap: () {
                             Get.to(
-                              SingleClassPost(
-                                title: listOfTopics[index].title,
-                                contentType: listOfTopics[index].contentType,
-                                content: listOfTopics[index].content,
+                              () => SingleClassPost(
+                                fullData: listOfTopics[index],
+                                path: "${widget.path}/$index",
                               ),
                             );
                           },

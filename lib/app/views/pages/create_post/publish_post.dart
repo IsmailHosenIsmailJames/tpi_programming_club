@@ -124,7 +124,8 @@ class _PublishPostState extends State<PublishPost> {
 
       // update user Data
       final user = FirebaseAuth.instance.currentUser!;
-      final userRef = FirebaseDatabase.instance.ref('user/${user.email}');
+      final userRef = FirebaseDatabase.instance
+          .ref('user/${user.email!.replaceAll('.', ',')}');
       final data = await userRef.get();
 
       final userData = jsonDecode(jsonEncode(data.value));
