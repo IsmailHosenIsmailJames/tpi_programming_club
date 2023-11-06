@@ -17,6 +17,7 @@ class PostModel {
   Comments comments;
   String share;
   String impression;
+  String profile;
 
   PostModel({
     required this.id,
@@ -35,6 +36,7 @@ class PostModel {
     required this.comments,
     required this.share,
     required this.impression,
+    required this.profile,
   });
 
   factory PostModel.fromJson(String str) => PostModel.fromMap(json.decode(str));
@@ -42,22 +44,24 @@ class PostModel {
   String toJson() => json.encode(toMap());
 
   factory PostModel.fromMap(Map<String, dynamic> json) => PostModel(
-      id: json["id"],
-      contentType: json["contentType"],
-      topic: json["topic"],
-      topicId: json["topicId"],
-      title: json["title"],
-      img: json["img"],
-      owner: json["owner"],
-      description: json["description"],
-      content: json["content"],
-      likeCount: json["likeCount"],
-      likes: Likes.fromMap(json["likes"]),
-      commentsCount: json["commentsCount"],
-      comments: Comments.fromMap(json["comments"]),
-      share: json["share"],
-      impression: json["impression"],
-      ownerName: json['ownerName']);
+        id: json["id"],
+        contentType: json["contentType"],
+        topic: json["topic"],
+        topicId: json["topicId"],
+        title: json["title"],
+        img: json["img"],
+        owner: json["owner"],
+        description: json["description"],
+        content: json["content"],
+        likeCount: json["likeCount"],
+        likes: Likes.fromMap(json["likes"]),
+        commentsCount: json["commentsCount"],
+        comments: Comments.fromMap(json["comments"]),
+        share: json["share"],
+        impression: json["impression"],
+        ownerName: json['ownerName'],
+        profile: json['profile'],
+      );
 
   Map<String, dynamic> toMap() => {
         "id": id,
@@ -76,6 +80,7 @@ class PostModel {
         "share": share,
         "impression": impression,
         'ownerName': ownerName,
+        'profile': profile,
       };
 }
 
@@ -103,9 +108,11 @@ class CommentId {
   String email;
   String date;
   String message;
+  String profile;
 
   CommentId({
     required this.email,
+    required this.profile,
     required this.date,
     required this.message,
   });
@@ -115,12 +122,14 @@ class CommentId {
   String toJson() => json.encode(toMap());
 
   factory CommentId.fromMap(Map<String, dynamic> json) => CommentId(
+        profile: json['profile'],
         email: json["email"],
         date: json["date"],
         message: json["message"],
       );
 
   Map<String, dynamic> toMap() => {
+        'profile': profile,
         "email": email,
         "date": date,
         "message": message,

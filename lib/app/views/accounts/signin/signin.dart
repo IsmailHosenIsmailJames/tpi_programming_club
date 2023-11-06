@@ -1,6 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -50,9 +50,8 @@ class _SignInState extends State<SignIn> {
           posts: <String>[],
           followers: <String>[],
         );
-        await FirebaseFirestore.instance
-            .collection("user/")
-            .doc(email.text.trim())
+        await FirebaseDatabase.instance
+            .ref("user/${email.text.trim().replaceAll('.', ',')}")
             .set(model.toJson());
 
         await sentValidationEmail();

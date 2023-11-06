@@ -1,5 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -30,9 +32,10 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> getAccountInfo() async {
     final user = FirebaseAuth.instance.currentUser!;
-    final ref = FirebaseFirestore.instance.collection('user').doc(user.email);
-    final userData = await ref.get();
-
+    final ref = FirebaseDatabase.instance.ref('user/${user.email}');
+    final data = await ref.get();
+    if (data.value == null) return;
+    final userData = jsonDecode(jsonEncode(data.value));
     AccountModel accountModel = AccountModel(
       userName: userData['userName'],
       userEmail: userData['userEmail'],

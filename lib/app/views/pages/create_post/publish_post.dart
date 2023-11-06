@@ -1,4 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,127 @@ class _PublishPostState extends State<PublishPost> {
   String imgUrl = "null";
   String? title;
   String? description;
+
+  void publish() async {
+    if (validationKey.currentState!.validate()) {
+      controller.loadingIconOnUploadeTopics.value = SizedBox(
+        child: LoadingAnimationWidget.staggeredDotsWave(
+            color: Colors.white, size: 40),
+      );
+      final count =
+          await FirebaseDatabase.instance.ref("/contents/count/").get();
+      int id = 0;
+      if (count.value != null) {
+        id = int.parse(count.value.toString());
+      }
+
+      final classContentRef = FirebaseDatabase.instance.ref("classContent");
+      int classContentCount = 0;
+      var classContentCountData =
+          await classContentRef.child('contentCount').get();
+      if (classContentCountData.value != null) {
+        classContentCount = int.parse(classContentCountData.value.toString());
+      }
+      await FirebaseDatabase.instance
+          .ref("classContent/$classContentCount")
+          .set(widget.content);
+      await FirebaseDatabase.instance
+          .ref("classContent/contentCount")
+          .set("${classContentCount + 1}");
+
+      String contentPath = "classContent/$classContentCount";
+
+      PostModel post = PostModel(
+        profile: accuntInfo.img.value,
+        id: "$id",
+        contentType: widget.contentType,
+        topic: widget.name,
+        topicId: widget.id,
+        title: titleController.text,
+        img: imgUrl,
+        owner: owner!,
+        ownerName: accuntInfo.name.value,
+        description: descriptionController.text,
+        content: contentPath,
+        likeCount: "0",
+        likes: Likes(
+          likeId: LikeId(
+            email: "null",
+            date: "null",
+          ),
+        ),
+        commentsCount: "0",
+        comments: Comments(
+          commentId: CommentId(
+            profile: "null",
+            email: "null",
+            date: "null",
+            message: "null",
+          ),
+        ),
+        share: "0",
+        impression: "0",
+      );
+
+      int classCount = 0;
+      var classCountData =
+          await FirebaseDatabase.instance.ref("/contents/$id/classCount").get();
+
+      if (classCountData.exists) {
+        classCount = int.parse(classCountData.value.toString());
+      }
+
+      Map<String, dynamic> postDataMap = post.toMap();
+      var ref = FirebaseDatabase.instance.ref("/contents/$id/$classCount");
+
+      await ref.set(postDataMap);
+      ref = FirebaseDatabase.instance.ref("/contents/$id/classCount");
+      ref.set(
+        "${(classCount + 1)}",
+      );
+
+      // update user Data
+      final user = FirebaseAuth.instance.currentUser!;
+      final userRef = FirebaseDatabase.instance.ref('user/${user.email}');
+      final data = await userRef.get();
+
+      final userData = jsonDecode(jsonEncode(data.value));
+
+      AccountModel accountModel = AccountModel(
+        userName: userData['userName'],
+        userEmail: userData['userEmail'],
+        img: userData['img'],
+        posts: userData['posts'],
+        followers: userData['followers'],
+      );
+      accuntInfo.posts.add("/contents/$id/$classCount");
+
+      userRef.update(accountModel.toJson());
+
+      controller.loadingIconOnUploadeTopics.value = const SizedBox(
+        child: Text("Uploaded"),
+      );
+
+      Get.to(() => const HomePage());
+
+      // ignore: use_build_context_synchronously
+      showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Successfully Uploaded'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, 'OK');
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -191,137 +313,7 @@ class _PublishPostState extends State<PublishPost> {
                               minimumSize: const Size(double.infinity, 50),
                             ),
                             onPressed: () async {
-                              if (validationKey.currentState!.validate()) {
-                                controller.loadingIconOnUploadeTopics.value =
-                                    SizedBox(
-                                  child:
-                                      LoadingAnimationWidget.staggeredDotsWave(
-                                          color: Colors.white, size: 40),
-                                );
-                                final count = await FirebaseDatabase.instance
-                                    .ref("/contents/count/")
-                                    .get();
-                                int id = 0;
-                                if (count.value != null) {
-                                  id = int.parse(count.value.toString());
-                                }
-
-                                final classContentRef = FirebaseDatabase
-                                    .instance
-                                    .ref("classContent");
-                                int classContentCount = 0;
-                                var classContentCountData =
-                                    await classContentRef
-                                        .child('contentCount')
-                                        .get();
-                                if (classContentCountData.value != null) {
-                                  classContentCount = int.parse(
-                                      classContentCountData.value.toString());
-                                }
-                                await FirebaseDatabase.instance
-                                    .ref("classContent/$classContentCount")
-                                    .set(widget.content);
-                                await FirebaseDatabase.instance
-                                    .ref("classContent/contentCount")
-                                    .set("${classContentCount + 1}");
-
-                                String contentPath =
-                                    "classContent/$classContentCount";
-
-                                PostModel post = PostModel(
-                                  id: "$id",
-                                  contentType: widget.contentType,
-                                  topic: widget.name,
-                                  topicId: widget.id,
-                                  title: titleController.text,
-                                  img: imgUrl,
-                                  owner: owner!,
-                                  ownerName: accuntInfo.name.value,
-                                  description: descriptionController.text,
-                                  content: contentPath,
-                                  likeCount: "0",
-                                  likes: Likes(
-                                    likeId: LikeId(
-                                      email: "null",
-                                      date: "null",
-                                    ),
-                                  ),
-                                  commentsCount: "0",
-                                  comments: Comments(
-                                    commentId: CommentId(
-                                      email: "null",
-                                      date: "null",
-                                      message: "null",
-                                    ),
-                                  ),
-                                  share: "0",
-                                  impression: "0",
-                                );
-
-                                int classCount = 0;
-                                var classCountData = await FirebaseDatabase
-                                    .instance
-                                    .ref("/contents/$id/classCount")
-                                    .get();
-
-                                if (classCountData.exists) {
-                                  classCount = int.parse(
-                                      classCountData.value.toString());
-                                }
-
-                                Map<String, dynamic> postDataMap = post.toMap();
-                                var ref = FirebaseDatabase.instance
-                                    .ref("/contents/$id/$classCount");
-
-                                await ref.set(postDataMap);
-                                ref = FirebaseDatabase.instance
-                                    .ref("/contents/$id/classCount");
-                                ref.set(
-                                  "${(classCount + 1)}",
-                                );
-
-                                // update user Data
-                                final user = FirebaseAuth.instance.currentUser!;
-                                final userRef = FirebaseFirestore.instance
-                                    .collection('user')
-                                    .doc(user.email);
-                                final userData = await userRef.get();
-
-                                AccountModel accountModel = AccountModel(
-                                  userName: userData['userName'],
-                                  userEmail: userData['userEmail'],
-                                  img: userData['img'],
-                                  posts: userData['posts'],
-                                  followers: userData['followers'],
-                                );
-                                accuntInfo.posts
-                                    .add("/contents/$id/$classCount");
-
-                                userRef.update(accountModel.toJson());
-
-                                controller.loadingIconOnUploadeTopics.value =
-                                    const SizedBox(
-                                  child: Text("Uploaded"),
-                                );
-
-                                Get.to(() => const HomePage());
-
-                                // ignore: use_build_context_synchronously
-                                showDialog<String>(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Successfully Uploaded'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context, 'OK');
-                                        },
-                                        child: const Text('OK'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
+                              publish();
                             },
                             child: controller.loadingIconOnUploadeTopics.value,
                           ),

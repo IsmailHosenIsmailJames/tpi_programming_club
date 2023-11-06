@@ -59,14 +59,18 @@ class _MarkDownOutPutState extends State<MarkDownOutPut> {
           )
         ],
       ),
-      body: Markdown(
-        data: widget.markdown,
-        selectable: true,
-        onTapLink: (text, href, title) async {
-          if (!await launchUrl(Uri.parse(href!))) {
-            throw Exception('Could not launch $href');
-          }
-        },
+      body: SingleChildScrollView(
+        child: Expanded(
+          child: MarkdownBody(
+            data: widget.markdown,
+            selectable: true,
+            onTapLink: (text, href, title) async {
+              if (!await launchUrl(Uri.parse(href!))) {
+                throw Exception('Could not launch $href');
+              }
+            },
+          ),
+        ),
       ),
     );
   }
