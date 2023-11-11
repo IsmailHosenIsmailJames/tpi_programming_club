@@ -2,8 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tpi_programming_club/app/views/accounts/init.dart';
 
 import 'app/themes/app_theme_data.dart';
@@ -13,8 +12,7 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final directory = await getApplicationDocumentsDirectory();
-  Hive.init(directory.path);
+  await Hive.initFlutter();
   await Hive.openBox('tpi_programming_club');
 
   await Firebase.initializeApp(

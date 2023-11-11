@@ -44,6 +44,7 @@ dependencies:
   firebase_storage: ^11.2.8
   get: ^4.6.6
   hive: ^2.2.3
+  hive_flutter:
   path_provider: ^2.1.1
   fluttertoast: ^8.2.2
   file_picker: ^6.0.0
@@ -67,6 +68,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  hive_generator:
+  build_runner:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
