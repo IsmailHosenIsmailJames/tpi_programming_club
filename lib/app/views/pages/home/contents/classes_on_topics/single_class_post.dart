@@ -179,7 +179,9 @@ class _SingleClassPostState extends State<SingleClassPost> {
                         itemBuilder: (context, index) => x[index],
                       );
                     } else {
-                      return MarkdownBody(data: widget.fullData.content);
+                      return MarkdownBody(
+                        data: snapshot.data!.value.toString(),
+                      );
                     }
                   } else {
                     return const Text("There have no data");
