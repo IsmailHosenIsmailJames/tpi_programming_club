@@ -47,8 +47,8 @@ class _SignInState extends State<SignIn> {
           userName: name.text.trim(),
           userEmail: email.text.trim(),
           img: "null",
-          posts: <String>[],
-          followers: <String>[],
+          posts: <String>["null"],
+          followers: <String>["null"],
         );
         await FirebaseDatabase.instance
             .ref("user/${email.text.trim().replaceAll('.', ',')}")

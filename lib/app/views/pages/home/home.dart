@@ -35,6 +35,7 @@ class _HomePageState extends State<HomePage> {
     final ref = FirebaseDatabase.instance
         .ref('user/${user.email!.replaceAll('.', ',')}');
     final data = await ref.get();
+
     if (data.value == null) return;
     final userData = jsonDecode(jsonEncode(data.value));
     AccountModel accountModel = AccountModel(

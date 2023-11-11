@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +13,16 @@ import 'package:highlight/languages/all.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class CreatePostViewQuill {
+  List<Widget> createWidgetFromString(String data) {
+    List<Map<String, dynamic>> listOfMap = [];
+    List decodedData = jsonDecode(data);
+    for (var element in decodedData) {
+      listOfMap.add(Map<String, dynamic>.from(element));
+    }
+
+    return createWidget(listOfMap);
+  }
+
   List<Widget> createWidget(List<Map<String, dynamic>> data) {
     List<Widget> widgetList = [];
     for (var i = 0; i < data.length; i++) {
