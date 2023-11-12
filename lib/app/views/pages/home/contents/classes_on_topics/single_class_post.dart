@@ -332,7 +332,7 @@ class _SingleClassPostState extends State<SingleClassPost> {
                                                 .ref(
                                                     "${widget.path}/commentsCount/")
                                                 .set(
-                                                    "${int.parse(widget.fullData.commentsCount) + 1}");
+                                                    "${int.parse(cmcount) + 1}");
                                             Map<String, dynamic> tem = {};
                                             coments.forEach((key, value) {
                                               tem.addAll({key: value.toMap()});
