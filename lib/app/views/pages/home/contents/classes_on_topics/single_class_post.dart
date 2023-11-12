@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/views/accounts/account_info_controller.dart';
 import 'package:tpi_programming_club/app/views/pages/create_post/quill_editor/create_post_view_quill.dart';
@@ -54,67 +56,71 @@ class _SingleClassPostState extends State<SingleClassPost> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.data != null) {
-                    final data = jsonDecode(jsonEncode(snapshot.data!.value));
-                    return Row(
-                      children: [
-                        SizedBox(
-                          height: 60,
-                          width: 60,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
-                            child: data['img'] == 'null'
-                                ? Center(
-                                    child: Text(
-                                      widget.fullData.ownerName.substring(0, 2),
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  )
-                                : CachedNetworkImage(
-                                    imageUrl: data['img'],
-                                    fit: BoxFit.scaleDown,
-                                    progressIndicatorBuilder:
-                                        (context, url, downloadProgress) {
-                                      return Center(
-                                        child: LoadingAnimationWidget
-                                            .staggeredDotsWave(
-                                          color: Colors.white,
-                                          size: 40,
+                    if (snapshot.hasData) {
+                      final data = jsonDecode(jsonEncode(snapshot.data!.value));
+                      return Row(
+                        children: [
+                          SizedBox(
+                            height: 60,
+                            width: 60,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: data['img'] == 'null'
+                                  ? Center(
+                                      child: Text(
+                                        widget.fullData.ownerName
+                                            .substring(0, 2),
+                                        style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                      );
-                                    },
-                                  ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    )
+                                  : CachedNetworkImage(
+                                      imageUrl: data['img'],
+                                      fit: BoxFit.scaleDown,
+                                      progressIndicatorBuilder:
+                                          (context, url, downloadProgress) {
+                                        return Center(
+                                          child: LoadingAnimationWidget
+                                              .staggeredDotsWave(
+                                            color: Colors.white,
+                                            size: 40,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.fullData.ownerName,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.fullData.ownerName,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              widget.fullData.owner,
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                widget.fullData.owner,
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    }
                   }
                 }
+
                 return Row(
                   children: [
                     SizedBox(
@@ -167,30 +173,65 @@ class _SingleClassPostState extends State<SingleClassPost> {
               future:
                   FirebaseDatabase.instance.ref(widget.fullData.content).get(),
               builder: (context, snapshot) {
+                String contentData = "";
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasData) {
-                    if (widget.fullData.contentType == 'quill') {
-                      final x = CreatePostViewQuill().createWidgetFromString(
+                    try {
+                      final box = Hive.box("tpi_programming_club");
+                      box.put(widget.fullData.content,
                           snapshot.data!.value.toString());
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount:
-                            jsonDecode(snapshot.data!.value.toString()).length,
-                        itemBuilder: (context, index) => x[index],
-                      );
-                    } else {
-                      return MarkdownBody(
-                        data: snapshot.data!.value.toString(),
-                      );
+                      contentData = snapshot.data!.value.toString();
+                    } catch (e) {
+                      if (kDebugMode) {
+                        print(e);
+                      }
                     }
                   } else {
-                    return const Text("There have no data");
+                    try {
+                      final box = Hive.box("tpi_programming_club");
+                      contentData = box.get(widget.fullData.content).toString();
+                    } catch (e) {
+                      if (kDebugMode) {
+                        print(e);
+                      }
+                    }
                   }
                 } else if (snapshot.connectionState == ConnectionState.active) {
+                  try {
+                    final box = Hive.box("tpi_programming_club");
+                    contentData = box.get(widget.fullData.content).toString();
+                  } catch (e) {
+                    if (kDebugMode) {
+                      print(e);
+                    }
+                  }
                   return LoadingAnimationWidget.staggeredDotsWave(
                     color: Colors.white,
                     size: 40,
                   );
+                }
+                try {
+                  final box = Hive.box("tpi_programming_club");
+                  contentData = box.get(widget.fullData.content).toString();
+                } catch (e) {
+                  if (kDebugMode) {
+                    print(e);
+                  }
+                }
+                if (contentData.isNotEmpty) {
+                  if (widget.fullData.contentType == 'quill') {
+                    final x = CreatePostViewQuill()
+                        .createWidgetFromString(contentData);
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: jsonDecode(contentData).length,
+                      itemBuilder: (context, index) => x[index],
+                    );
+                  } else {
+                    return MarkdownBody(
+                      data: contentData,
+                    );
+                  }
                 }
                 return LoadingAnimationWidget.staggeredDotsWave(
                   color: Colors.white,

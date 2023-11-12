@@ -66,12 +66,8 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
                 }
               }
             }
-          } else if (snapshot.connectionState == ConnectionState.active) {
-            return Center(
-              child: LoadingAnimationWidget.staggeredDotsWave(
-                  color: Colors.blue, size: 40),
-            );
-          } else {
+          }
+          if (listOfTopics.isEmpty) {
             try {
               var box = Hive.box("tpi_programming_club");
               int count = int.parse(box.get("contents/classCount"));
@@ -95,6 +91,7 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
               }
             }
           }
+
           if (listOfTopics.isNotEmpty) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -57,7 +57,9 @@ class _HomePageContentState extends State<HomePageContent> {
             child: LoadingAnimationWidget.staggeredDotsWave(
                 color: Colors.blue, size: 40),
           );
-        } else {
+        }
+
+        if (listOfTopics.isEmpty) {
           try {
             var box = Hive.box("tpi_programming_club");
             int count = int.parse(box.get("contents/topics/count"));
@@ -130,7 +132,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         onTap: () {
                           String path = "contents/${listOfTopics[index].id}";
                           Get.to(
-                            ClassesOnTopics(
+                            () => ClassesOnTopics(
                               path: path,
                               topicsName: listOfTopics[index].name,
                             ),
