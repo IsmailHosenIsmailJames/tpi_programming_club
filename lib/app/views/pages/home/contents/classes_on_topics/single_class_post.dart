@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,15 @@ class SingleClassPost extends StatefulWidget {
 
 class _SingleClassPostState extends State<SingleClassPost> {
   final accountInfo = Get.put(AccountInfoController());
+  TextEditingController commentTextController = TextEditingController();
+  String cmcount = "";
+  Map<String, Comment> cmMessage = {};
+  @override
+  void initState() {
+    cmcount = widget.fullData.commentsCount;
+    cmMessage = widget.fullData.comments;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -265,24 +275,252 @@ class _SingleClassPostState extends State<SingleClassPost> {
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return Scaffold(
+                          body: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: SafeArea(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    TextFormField(
+                                      controller: commentTextController,
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        ElevatedButton.icon(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          icon: const Icon(Icons.cancel),
+                                          label: const Text("Cancle"),
+                                        ),
+                                        ElevatedButton.icon(
+                                          onPressed: () async {
+                                            Navigator.pop(context);
+                                            final time = DateTime.now();
+                                            final coments =
+                                                widget.fullData.comments;
+                                            coments.addAll({
+                                              widget.fullData.commentsCount:
+                                                  Comment(
+                                                profile: accountInfo.img.value,
+                                                email: FirebaseAuth
+                                                    .instance.currentUser!.email
+                                                    .toString(),
+                                                date:
+                                                    "Date: ${time.day}/${time.month}/${time.year} at ${time.hour}:${time.minute}:${time.second}",
+                                                message: commentTextController
+                                                    .text
+                                                    .trim(),
+                                              ),
+                                            });
+                                            await FirebaseDatabase.instance
+                                                .ref(
+                                                    "${widget.path}/commentsCount/")
+                                                .set(
+                                                    "${int.parse(widget.fullData.commentsCount) + 1}");
+                                            Map<String, dynamic> tem = {};
+                                            coments.forEach((key, value) {
+                                              tem.addAll({key: value.toMap()});
+                                            });
+                                            await FirebaseDatabase.instance
+                                                .ref("${widget.path}/comments/")
+                                                .update(tem);
+                                            commentTextController.clear();
+
+                                            setState(() {
+                                              cmcount = (int.parse(cmcount) + 1)
+                                                  .toString();
+                                              final x = widget.fullData.toMap();
+                                              x["comments"] = tem;
+
+                                              cmMessage =
+                                                  PostModel.fromMap(x).comments;
+                                            });
+                                          },
+                                          icon: const Icon(Icons.done),
+                                          label: const Text("Ok"),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
                   icon: const Icon(
                     Icons.comment,
                     color: Colors.grey,
                   ),
                   label: Text(
-                    widget.fullData.commentsCount,
+                    cmcount,
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ],
             ),
-          )
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          const Center(
+            child: Text("Comments"),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Container(
+            margin:
+                const EdgeInsets.only(left: 5, right: 5, top: 15, bottom: 10),
+            padding: const EdgeInsets.all(3),
+            child: Column(
+              children: createCommentsWidget(cmMessage),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  List<Widget> createCommentsWidget(Map<String, Comment> comments) {
+    List<Widget> widgets = [];
+    String? userMail = FirebaseAuth.instance.currentUser?.email;
+
+    comments.forEach((key, value) {
+      if (key != 'id' && key != 'commentId') {
+        if (userMail == value.email) {
+          widgets.add(
+            Row(
+              children: [
+                const Spacer(),
+                Container(
+                  margin: const EdgeInsets.all(3),
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: const Color.fromARGB(80, 143, 143, 143),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        child: Text(
+                          value.email,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 2,
+                      ),
+                      Text(
+                        value.date,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: const Color.fromARGB(80, 143, 143, 143),
+                        ),
+                        child: Text(
+                          value.message,
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else {
+          widgets.add(
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: const Color.fromARGB(80, 143, 143, 143),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        child: Text(
+                          value.email,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 2,
+                      ),
+                      Text(
+                        value.date,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: const Color.fromARGB(80, 143, 143, 143),
+                        ),
+                        child: Text(
+                          value.message,
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+              ],
+            ),
+          );
+        }
+      }
+    });
+    return widgets;
   }
 }

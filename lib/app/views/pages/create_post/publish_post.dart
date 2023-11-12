@@ -86,21 +86,18 @@ class _PublishPostState extends State<PublishPost> {
         description: descriptionController.text,
         content: contentPath,
         likeCount: "0",
-        likes: Likes(
-          likeId: LikeId(
-            email: "null",
-            date: "null",
-          ),
-        ),
+        likes: {
+          "id": Like(email: "email", date: "date"),
+        },
         commentsCount: "0",
-        comments: Comments(
-          commentId: CommentId(
+        comments: {
+          "id": Comment(
             profile: "null",
             email: "null",
             date: "null",
             message: "null",
           ),
-        ),
+        },
         share: "0",
         impression: "0",
       );

@@ -4,39 +4,39 @@ class PostModel {
   String id;
   String contentType;
   String topic;
-  String ownerName;
   String topicId;
-  String title;
   String img;
+  String title;
   String owner;
   String description;
   String content;
+  String ownerName;
   String likeCount;
-  Likes likes;
+  String profile;
+  Map<String, Like> likes;
   String commentsCount;
-  Comments comments;
+  Map<String, Comment> comments;
   String share;
   String impression;
-  String profile;
 
   PostModel({
     required this.id,
     required this.contentType,
     required this.topic,
     required this.topicId,
-    required this.title,
     required this.img,
+    required this.title,
     required this.owner,
-    required this.ownerName,
     required this.description,
     required this.content,
+    required this.ownerName,
     required this.likeCount,
+    required this.profile,
     required this.likes,
     required this.commentsCount,
     required this.comments,
     required this.share,
     required this.impression,
-    required this.profile,
   });
 
   factory PostModel.fromJson(String str) => PostModel.fromMap(json.decode(str));
@@ -48,19 +48,21 @@ class PostModel {
         contentType: json["contentType"],
         topic: json["topic"],
         topicId: json["topicId"],
-        title: json["title"],
         img: json["img"],
+        title: json["title"],
         owner: json["owner"],
         description: json["description"],
         content: json["content"],
+        ownerName: json["ownerName"],
         likeCount: json["likeCount"],
-        likes: Likes.fromMap(json["likes"]),
+        profile: json["profile"],
+        likes: Map.from(json["likes"])
+            .map((k, v) => MapEntry<String, Like>(k, Like.fromMap(v))),
         commentsCount: json["commentsCount"],
-        comments: Comments.fromMap(json["comments"]),
+        comments: Map.from(json["comments"])
+            .map((k, v) => MapEntry<String, Comment>(k, Comment.fromMap(v))),
         share: json["share"],
         impression: json["impression"],
-        ownerName: json['ownerName'],
-        profile: json['profile'],
       );
 
   Map<String, dynamic> toMap() => {
@@ -68,108 +70,70 @@ class PostModel {
         "contentType": contentType,
         "topic": topic,
         "topicId": topicId,
-        "title": title,
         "img": img,
+        "title": title,
         "owner": owner,
         "description": description,
         "content": content,
+        "ownerName": ownerName,
         "likeCount": likeCount,
-        "likes": likes.toMap(),
+        "profile": profile,
+        "likes": Map.from(likes)
+            .map((k, v) => MapEntry<String, dynamic>(k, v.toMap())),
         "commentsCount": commentsCount,
-        "comments": comments.toMap(),
+        "comments": Map.from(comments)
+            .map((k, v) => MapEntry<String, dynamic>(k, v.toMap())),
         "share": share,
         "impression": impression,
-        'ownerName': ownerName,
-        'profile': profile,
       };
 }
 
-class Comments {
-  CommentId commentId;
-
-  Comments({
-    required this.commentId,
-  });
-
-  factory Comments.fromJson(String str) => Comments.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory Comments.fromMap(Map<String, dynamic> json) => Comments(
-        commentId: CommentId.fromMap(json["commentId"]),
-      );
-
-  Map<String, dynamic> toMap() => {
-        "commentId": commentId.toMap(),
-      };
-}
-
-class CommentId {
+class Comment {
+  String profile;
   String email;
   String date;
   String message;
-  String profile;
 
-  CommentId({
-    required this.email,
+  Comment({
     required this.profile,
+    required this.email,
     required this.date,
     required this.message,
   });
 
-  factory CommentId.fromJson(String str) => CommentId.fromMap(json.decode(str));
+  factory Comment.fromJson(String str) => Comment.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory CommentId.fromMap(Map<String, dynamic> json) => CommentId(
-        profile: json['profile'],
+  factory Comment.fromMap(Map<String, dynamic> json) => Comment(
+        profile: json["profile"],
         email: json["email"],
         date: json["date"],
         message: json["message"],
       );
 
   Map<String, dynamic> toMap() => {
-        'profile': profile,
+        "profile": profile,
         "email": email,
         "date": date,
         "message": message,
       };
 }
 
-class Likes {
-  LikeId likeId;
-
-  Likes({
-    required this.likeId,
-  });
-
-  factory Likes.fromJson(String str) => Likes.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory Likes.fromMap(Map<String, dynamic> json) => Likes(
-        likeId: LikeId.fromMap(json["likeId"]),
-      );
-
-  Map<String, dynamic> toMap() => {
-        "likeId": likeId.toMap(),
-      };
-}
-
-class LikeId {
+class Like {
   String email;
   String date;
 
-  LikeId({
+  Like({
     required this.email,
     required this.date,
   });
 
-  factory LikeId.fromJson(String str) => LikeId.fromMap(json.decode(str));
+  factory Like.fromJson(String str) => Like.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory LikeId.fromMap(Map<String, dynamic> json) => LikeId(
+  factory Like.fromMap(Map<String, dynamic> json) => Like(
         email: json["email"],
         date: json["date"],
       );

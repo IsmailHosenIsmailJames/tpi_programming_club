@@ -12,14 +12,38 @@
   "likeCount": "0",
   "profile": "imgUrl",
   "likes": {
-    "likeId": {
+    "0": {
+      "email": "email",
+      "date": "date"
+    },
+    "1": {
+      "email": "email",
+      "date": "date"
+    },
+    "2": {
+      "email": "email",
+      "date": "date"
+    },
+    "3": {
       "email": "email",
       "date": "date"
     }
   },
-  "commentsCount": "commentCount",
+  "commentsCount": "0",
   "comments": {
-    "commentId": {
+    "0": {
+      "profile": "imgUrl",
+      "email": "email",
+      "date": "date",
+      "message": "message"
+    },
+    "1": {
+      "profile": "imgUrl",
+      "email": "email",
+      "date": "date",
+      "message": "message"
+    },
+    "2": {
       "profile": "imgUrl",
       "email": "email",
       "date": "date",
