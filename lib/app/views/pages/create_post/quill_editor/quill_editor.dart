@@ -694,24 +694,8 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
         child: ListView(
           reverse: true,
           children: [
-            QuillToolbar(
-              configurations: QuillToolbarConfigurations(
-                customButtons: [
-                  QuillCustomButton(
-                    child: const Icon(Icons.add),
-                    tooltip: "Add this data to post",
-                    onTap: () {
-                      if (quillEditorController.document.toPlainText() !=
-                          "\n") {
-                        addQuillDataToPost(
-                          quillEditorController.document.toDelta().toJson(),
-                        );
-                        quillEditorController.clear();
-                      }
-                    },
-                  ),
-                ],
-              ),
+            const QuillToolbar(
+              configurations: QuillToolbarConfigurations(),
             ),
             const SizedBox(
               height: 5,

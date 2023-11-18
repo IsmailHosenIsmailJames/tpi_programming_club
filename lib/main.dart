@@ -37,21 +37,9 @@ class MyApp extends StatelessWidget {
       title: 'TPI Programming Club',
       themeMode: ThemeMode.system,
       darkTheme: ThemeData.dark().copyWith(
-        primaryColor: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
-          iconTheme: IconThemeData(color: Colors.white),
-          shadowColor: Colors.transparent,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
       ),
       theme: ThemeData.light().copyWith(
-        primaryColor: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
