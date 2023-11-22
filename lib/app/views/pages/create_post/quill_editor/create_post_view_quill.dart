@@ -57,11 +57,9 @@ class CreatePostViewQuill {
           selection: const TextSelection(baseOffset: 0, extentOffset: 0),
         ),
       ),
-      child: Expanded(
-        child: QuillEditor.basic(
-          configurations: const QuillEditorConfigurations(
-            readOnly: true,
-          ),
+      child: QuillEditor.basic(
+        configurations: const QuillEditorConfigurations(
+          readOnly: true,
         ),
       ),
     );
