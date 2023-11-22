@@ -1,8 +1,11 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/views/accounts/login_widget_controller.dart';
 
@@ -25,6 +28,38 @@ class _LogInState extends State<LogIn> {
   final validationKey = GlobalKey<FormState>();
   final AccountWidgetController accountGetController =
       Get.put(AccountWidgetController());
+
+  Future<UserCredential> signInWithGoogleAndroid() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  Future<UserCredential> signInWithGoogleWeb() async {
+    // Create a new provider
+    GoogleAuthProvider googleProvider = GoogleAuthProvider();
+
+    googleProvider
+        .addScope('https://www.googleapis.com/auth/contacts.readonly');
+    googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithPopup(googleProvider);
+
+    // Or use signInWithRedirect
+  }
 
   void logIn() async {
     if (validationKey.currentState!.validate()) {
@@ -198,6 +233,42 @@ class _LogInState extends State<LogIn> {
                             },
                             child: accountGetController.login.value,
                           ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            maximumSize: const Size(380, 50),
+                            minimumSize: const Size(380, 50),
+                            backgroundColor:
+                                const Color.fromARGB(80, 158, 158, 158),
+                          ),
+                          onPressed: () async {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                            if (kIsWeb) {
+                              final result = await signInWithGoogleWeb();
+                              if (kDebugMode) {
+                                print(result.user!.email);
+                              }
+                              // ignore: use_build_context_synchronously
+                              Navigator.pop(context);
+                            } else {
+                              final result = await signInWithGoogleAndroid();
+                              if (kDebugMode) {
+                                print(result.user!.email);
+                              }
+                              // ignore: use_build_context_synchronously
+                              Navigator.pop(context);
+                            }
+                          },
+                          icon: const Icon(FontAwesomeIcons.google),
+                          label: const Text("Signin With Google"),
                         ),
                         const SizedBox(
                           height: 15,

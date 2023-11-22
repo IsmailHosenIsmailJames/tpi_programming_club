@@ -224,8 +224,9 @@ class _HomePageContentState extends State<HomePageContent> {
           );
         }
 
-        return const Center(
-            child: Text("Error When Loading. Cheak internet connection"));
+        return Center(
+          child: LoadingAnimationWidget.inkDrop(color: Colors.grey, size: 40),
+        );
       },
     );
   }

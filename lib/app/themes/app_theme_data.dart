@@ -54,6 +54,7 @@ class AppThemeData extends GetxController {
       }
     } else {
       box.put('theme_preference', 'system');
+      initTheme();
     }
   }
 

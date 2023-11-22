@@ -108,15 +108,13 @@ class CreatePostViewQuill {
       language: allLanguages[partOfData['data']['language']],
     );
 
-    return Expanded(
-      child: CodeTheme(
-        data: CodeThemeData(styles: codeThemeStyle),
-        child: CodeField(
-          readOnly: true,
-          controller: codeController,
-          textStyle: GoogleFonts.firaMono(
-            color: Colors.white,
-          ),
+    return CodeTheme(
+      data: CodeThemeData(styles: codeThemeStyle),
+      child: CodeField(
+        readOnly: true,
+        controller: codeController,
+        textStyle: GoogleFonts.firaMono(
+          color: Colors.white,
         ),
       ),
     );
