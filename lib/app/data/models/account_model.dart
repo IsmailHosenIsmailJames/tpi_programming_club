@@ -4,6 +4,7 @@ class AccountModel {
   String userName;
   String userEmail;
   String img;
+  String uid;
   List<dynamic> posts;
   List<dynamic> followers;
 
@@ -13,6 +14,7 @@ class AccountModel {
     required this.img,
     required this.posts,
     required this.followers,
+    required this.uid,
   });
 
   factory AccountModel.fromRawJson(String str) =>
@@ -26,6 +28,7 @@ class AccountModel {
         img: json["img"],
         posts: List<dynamic>.from(json["posts"].map((x) => x)),
         followers: List<dynamic>.from(json["followers"].map((x) => x)),
+        uid: json['uid'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -34,5 +37,6 @@ class AccountModel {
         "img": img,
         "posts": List<dynamic>.from(posts.map((x) => x)),
         "followers": List<dynamic>.from(followers.map((x) => x)),
+        'uid': uid,
       };
 }

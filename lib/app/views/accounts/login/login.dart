@@ -1,5 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -7,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:tpi_programming_club/app/data/models/account_model.dart';
 import 'package:tpi_programming_club/app/views/accounts/login_widget_controller.dart';
 
 import '../../../themes/const_theme_data.dart';
@@ -245,26 +247,35 @@ class _LogInState extends State<LogIn> {
                                 const Color.fromARGB(80, 158, 158, 158),
                           ),
                           onPressed: () async {
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (context) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
                             if (kIsWeb) {
                               final result = await signInWithGoogleWeb();
                               if (kDebugMode) {
                                 print(result.user!.email);
                               }
-                              // ignore: use_build_context_synchronously
-                              Navigator.pop(context);
                             } else {
                               final result = await signInWithGoogleAndroid();
                               if (kDebugMode) {
                                 print(result.user!.email);
                               }
-                              // ignore: use_build_context_synchronously
-                              Navigator.pop(context);
+                            }
+                            final user = FirebaseAuth.instance.currentUser!;
+                            AccountModel accountModel = AccountModel(
+                              userName: user.displayName!,
+                              userEmail: user.email!,
+                              img: user.photoURL == null
+                                  ? "null"
+                                  : user.photoURL!,
+                              posts: [],
+                              followers: [],
+                              uid: user.uid,
+                            );
+                            final cheakInfo = await FirebaseDatabase.instance
+                                .ref("user/${user.uid}/")
+                                .get();
+                            if (!(cheakInfo.exists)) {
+                              await FirebaseDatabase.instance
+                                  .ref("user/${user.uid}/")
+                                  .set(accountModel.toJson());
                             }
                           },
                           icon: const Icon(FontAwesomeIcons.google),

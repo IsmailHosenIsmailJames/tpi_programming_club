@@ -79,15 +79,17 @@ class _SignInState extends State<SignIn> {
       try {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: email.text.trim(), password: password.text);
+        await FirebaseAuth.instance.currentUser!.updateDisplayName(name.text);
         AccountModel model = AccountModel(
           userName: name.text.trim(),
           userEmail: email.text.trim(),
           img: "null",
+          uid: FirebaseAuth.instance.currentUser!.uid,
           posts: <String>["null"],
           followers: <String>["null"],
         );
         await FirebaseDatabase.instance
-            .ref("user/${email.text.trim().replaceAll('.', ',')}")
+            .ref("user/${FirebaseAuth.instance.currentUser!.uid}")
             .set(model.toJson());
 
         await sentValidationEmail();
@@ -324,27 +326,31 @@ class _SignInState extends State<SignIn> {
                                 const Color.fromARGB(80, 158, 158, 158),
                           ),
                           onPressed: () async {
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (context) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
                             if (kIsWeb) {
                               final result = await signInWithGoogleWeb();
                               if (kDebugMode) {
                                 print(result.user!.email);
                               }
-                              // ignore: use_build_context_synchronously
-                              Navigator.pop(context);
                             } else {
                               final result = await signInWithGoogleAndroid();
                               if (kDebugMode) {
                                 print(result.user!.email);
                               }
-                              // ignore: use_build_context_synchronously
-                              Navigator.pop(context);
                             }
+                            final user = FirebaseAuth.instance.currentUser!;
+                            AccountModel accountModel = AccountModel(
+                              userName: user.displayName!,
+                              userEmail: user.email!,
+                              img: user.photoURL == null
+                                  ? "null"
+                                  : user.photoURL!,
+                              posts: [],
+                              followers: [],
+                              uid: user.uid,
+                            );
+                            await FirebaseDatabase.instance
+                                .ref("user/${user.uid}/")
+                                .set(accountModel.toJson());
                           },
                           icon: const Icon(FontAwesomeIcons.google),
                           label: const Text("Signin With Google"),

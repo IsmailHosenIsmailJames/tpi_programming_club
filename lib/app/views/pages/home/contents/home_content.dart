@@ -159,8 +159,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                       progressIndicatorBuilder:
                                           (context, url, downloadProgress) =>
                                               Center(
-                                        child: LoadingAnimationWidget
-                                            .staggeredDotsWave(
+                                        child: LoadingAnimationWidget.inkDrop(
                                           color: Colors.blue,
                                           size: 40,
                                         ),

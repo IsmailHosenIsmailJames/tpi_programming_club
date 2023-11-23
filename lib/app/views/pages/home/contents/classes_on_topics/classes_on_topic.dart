@@ -200,9 +200,8 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
                                                         (context, url,
                                                                 downloadProgress) =>
                                                             Center(
-                                                      child:
-                                                          LoadingAnimationWidget
-                                                              .staggeredDotsWave(
+                                                      child: LoadingAnimationWidget
+                                                          .horizontalRotatingDots(
                                                         color: Colors.white,
                                                         size: 40,
                                                       ),

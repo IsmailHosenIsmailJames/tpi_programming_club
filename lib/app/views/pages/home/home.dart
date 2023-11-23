@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -31,19 +28,16 @@ class _HomePageState extends State<HomePage> {
   final accountInfoController = Get.put(AccountInfoController());
 
   Future<void> getAccountInfo() async {
-    final user = FirebaseAuth.instance.currentUser!;
-    final ref = FirebaseDatabase.instance
-        .ref('user/${user.email!.replaceAll('.', ',')}');
-    final data = await ref.get();
+    final user = FirebaseAuth.instance.currentUser;
 
-    if (data.value == null) return;
-    final userData = jsonDecode(jsonEncode(data.value));
+    if (user == null) return;
     AccountModel accountModel = AccountModel(
-      userName: userData['userName'],
-      userEmail: userData['userEmail'],
-      img: userData['img'],
-      posts: userData['posts'],
-      followers: userData['followers'],
+      userName: user.displayName!,
+      uid: user.uid,
+      userEmail: user.email!,
+      img: user.photoURL == null ? "null" : user.photoURL!,
+      posts: [],
+      followers: [],
     );
     accountInfoController.name.value = accountModel.userName;
     accountInfoController.email.value = accountModel.userEmail;

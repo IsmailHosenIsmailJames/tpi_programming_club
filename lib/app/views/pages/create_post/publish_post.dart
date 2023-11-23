@@ -76,6 +76,7 @@ class _PublishPostState extends State<PublishPost> {
       PostModel post = PostModel(
         profile: accuntInfo.img.value,
         id: "$id",
+        ownerUid: FirebaseAuth.instance.currentUser!.uid,
         contentType: widget.contentType,
         topic: widget.name,
         topicId: widget.id,
@@ -87,7 +88,7 @@ class _PublishPostState extends State<PublishPost> {
         content: contentPath,
         likeCount: "0",
         likes: {
-          "id": Like(email: "email", date: "date"),
+          "id": Like(uid: "null", date: "date"),
         },
         commentsCount: "0",
         comments: {
@@ -95,6 +96,7 @@ class _PublishPostState extends State<PublishPost> {
             profile: "null",
             email: "null",
             date: "null",
+            uid: "null",
             message: "null",
           ),
         },
@@ -121,8 +123,7 @@ class _PublishPostState extends State<PublishPost> {
 
       // update user Data
       final user = FirebaseAuth.instance.currentUser!;
-      final userRef = FirebaseDatabase.instance
-          .ref('user/${user.email!.replaceAll('.', ',')}');
+      final userRef = FirebaseDatabase.instance.ref('user/${user.uid}/');
       final data = await userRef.get();
 
       final userData = jsonDecode(jsonEncode(data.value));
@@ -130,14 +131,13 @@ class _PublishPostState extends State<PublishPost> {
       AccountModel accountModel = AccountModel(
         userName: userData['userName'],
         userEmail: userData['userEmail'],
+        uid: userData["uid"],
         img: userData['img'],
-        posts: userData['posts'],
-        followers: userData['followers'],
+        posts: userData['posts'] ?? [],
+        followers: userData['followers'] ?? [],
       );
-      accuntInfo.posts.add("/contents/$id/$classCount");
-
-      userRef.update(accountModel.toJson());
-
+      accountModel.posts.add("/contents/$id/$classCount");
+      await userRef.update(accountModel.toJson());
       controller.loadingIconOnUploadeTopics.value = const SizedBox(
         child: Text("Uploaded"),
       );

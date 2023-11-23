@@ -162,13 +162,17 @@ class _SingleClassPostState extends State<SingleClassPost> {
   List<Widget> post = [];
   Widget likeCommentSattus = Container();
   List<Widget> comments = [];
-  List<Widget> fullPostTogether = [];
+  List<Widget> fullPostTogether = [
+    Center(
+      child: LoadingAnimationWidget.dotsTriangle(color: Colors.green, size: 30),
+    )
+  ];
 
   bool isAlreadyLiked(Map<String, Like> likes) {
     bool liked = false;
     String userEmail = FirebaseAuth.instance.currentUser!.email!;
     likes.forEach((key, value) {
-      if (value.email == userEmail) {
+      if (value.uid == userEmail) {
         liked = true;
       }
     });
@@ -189,7 +193,7 @@ class _SingleClassPostState extends State<SingleClassPost> {
           ),
           child: FutureBuilder(
             future: FirebaseDatabase.instance
-                .ref("user/${postData.owner.replaceAll('.', ",")}")
+                .ref("user/${postData.ownerUid}")
                 .get(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
@@ -378,11 +382,11 @@ class _SingleClassPostState extends State<SingleClassPost> {
           children: [
             TextButton.icon(
               onPressed: () async {
-                String userEmail = FirebaseAuth.instance.currentUser!.email!;
+                String uid = FirebaseAuth.instance.currentUser!.uid;
                 bool isDisLike = false;
                 String dislikeKey = "";
                 postData.likes.forEach((key, value) async {
-                  if (value.email == userEmail) {
+                  if (value.uid == uid) {
                     isDisLike = true;
                     dislikeKey = key;
                   }
@@ -390,6 +394,8 @@ class _SingleClassPostState extends State<SingleClassPost> {
                 if (isDisLike) {
                   int likeCount = int.parse(postData.likeCount);
                   likeCount--;
+                  print("object 543");
+                  if (likeCount < 0) return;
                   await FirebaseDatabase.instance
                       .ref("${widget.path}/likeCount")
                       .set(likeCount.toString());
@@ -404,7 +410,7 @@ class _SingleClassPostState extends State<SingleClassPost> {
                   int likeCount = int.parse(postData.likeCount);
                   final date = DateTime.now();
                   Like likeData = Like(
-                      email: userEmail,
+                      uid: FirebaseAuth.instance.currentUser!.uid,
                       date:
                           "${date.second}:${date.minute}:${date.hour} ${date.day}/${date.month}/${date.year}");
                   await FirebaseDatabase.instance
@@ -485,6 +491,8 @@ class _SingleClassPostState extends State<SingleClassPost> {
                                                 .toString(),
                                             date:
                                                 "Date: ${time.day}/${time.month}/${time.year} at ${time.hour}:${time.minute}:${time.second}",
+                                            uid: FirebaseAuth
+                                                .instance.currentUser!.uid,
                                             message: commentTextController.text
                                                 .trim(),
                                           ),

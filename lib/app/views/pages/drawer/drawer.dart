@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -210,7 +211,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   ),
                   TextButton(
                     onPressed: () {
-                      Get.to(const SelectTopics());
+                      Get.to(() => const SelectTopics());
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -322,6 +323,40 @@ class _HomeDrawerState extends State<HomeDrawer> {
                         )
                       ],
                     ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Icon(
+                          Icons.logout,
+                          color: appthemeController.iconColors.value,
+                        ),
+                        const SizedBox(
+                          width: 30,
+                        ),
+                        Text(
+                          "Log Out",
+                          style: TextStyle(
+                            color: appthemeController.iconColors.value,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
                   ),
                   const SizedBox(
                     height: 10,
