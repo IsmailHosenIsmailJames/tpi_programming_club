@@ -6,4 +6,5 @@ class AccountInfoController extends GetxController {
   RxString img = 'null'.obs;
   RxList posts = <dynamic>[].obs;
   RxList followers = <dynamic>[].obs;
+  RxBool allowMessages = false.obs;
 }

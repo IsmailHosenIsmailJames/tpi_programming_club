@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/views/accounts/account_info_controller.dart';
 import 'package:tpi_programming_club/app/views/pages/home/home.dart';
+import 'package:tpi_programming_club/app/views/pages/settings/setting.dart';
 
 import '../../../themes/app_theme_data.dart';
 import '../create_post/select_topics.dart';
@@ -270,7 +271,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
                     height: 10,
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(() => const Setting());
+                    },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [

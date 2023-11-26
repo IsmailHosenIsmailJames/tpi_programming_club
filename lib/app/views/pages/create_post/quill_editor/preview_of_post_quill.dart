@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tpi_programming_club/app/views/pages/create_post/publish_post.dart';
+import 'package:tpi_programming_club/app/views/pages/create_post/publish_post/publish_post.dart';
 
 import 'create_post_view_quill.dart';
 

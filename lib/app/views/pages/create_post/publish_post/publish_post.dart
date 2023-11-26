@@ -8,11 +8,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/core/image_picker.dart';
 import 'package:tpi_programming_club/app/views/accounts/account_info_controller.dart';
+import 'package:tpi_programming_club/app/views/pages/create_post/publish_post/getx_publish_controller.dart';
 import 'package:tpi_programming_club/app/views/pages/home/home.dart';
 
-import '../../../data/models/account_model.dart';
-import '../../../data/models/post_models.dart';
-import 'getx_create_post_controller.dart';
+import '../../../../data/models/account_model.dart';
+import '../../../../data/models/post_models.dart';
 
 class PublishPost extends StatefulWidget {
   const PublishPost(
@@ -33,7 +33,7 @@ class PublishPost extends StatefulWidget {
 
 class _PublishPostState extends State<PublishPost> {
   String? owner = FirebaseAuth.instance.currentUser!.email;
-  final controller = Get.put(CreatePostController());
+  final controller = Get.put(PublishPostControllerGetx());
   final accuntInfo = Get.put(AccountInfoController());
 
   final validationKey = GlobalKey<FormState>();
@@ -133,6 +133,7 @@ class _PublishPostState extends State<PublishPost> {
         userEmail: userData['userEmail'],
         uid: userData["uid"],
         img: userData['img'],
+        allowMessages: userData['allowMessages'],
         posts: userData['posts'] ?? [],
         followers: userData['followers'] ?? [],
       );

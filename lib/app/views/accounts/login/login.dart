@@ -268,6 +268,7 @@ class _LogInState extends State<LogIn> {
                               posts: [],
                               followers: [],
                               uid: user.uid,
+                              allowMessages: false,
                             );
                             final cheakInfo = await FirebaseDatabase.instance
                                 .ref("user/${user.uid}/")

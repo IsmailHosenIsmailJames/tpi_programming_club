@@ -85,6 +85,7 @@ class _SignInState extends State<SignIn> {
           userEmail: email.text.trim(),
           img: "null",
           uid: FirebaseAuth.instance.currentUser!.uid,
+          allowMessages: false,
           posts: <String>["null"],
           followers: <String>["null"],
         );
@@ -344,6 +345,7 @@ class _SignInState extends State<SignIn> {
                               img: user.photoURL == null
                                   ? "null"
                                   : user.photoURL!,
+                              allowMessages: false,
                               posts: [],
                               followers: [],
                               uid: user.uid,

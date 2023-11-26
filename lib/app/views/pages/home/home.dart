@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -31,10 +32,14 @@ class _HomePageState extends State<HomePage> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) return;
+    final allowMessagesData = await FirebaseDatabase.instance
+        .ref('/user/${user.uid}/allowMessages')
+        .get();
     AccountModel accountModel = AccountModel(
       userName: user.displayName!,
       uid: user.uid,
       userEmail: user.email!,
+      allowMessages: allowMessagesData.value == true ? true : false,
       img: user.photoURL == null ? "null" : user.photoURL!,
       posts: [],
       followers: [],
@@ -43,6 +48,7 @@ class _HomePageState extends State<HomePage> {
     accountInfoController.email.value = accountModel.userEmail;
     accountInfoController.img.value = accountModel.img;
     accountInfoController.posts.value = accountModel.posts;
+    accountInfoController.allowMessages.value = accountModel.allowMessages;
     accountInfoController.followers.value = accountModel.followers;
     var box = Hive.box("tpi_programming_club");
     box.put("userInfo", accountModel.toJson());

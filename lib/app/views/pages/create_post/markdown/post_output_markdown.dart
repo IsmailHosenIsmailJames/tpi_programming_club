@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../publish_post.dart';
+import '../publish_post/publish_post.dart';
 
 class MarkDownOutPut extends StatefulWidget {
   final String markdown;

@@ -394,7 +394,6 @@ class _SingleClassPostState extends State<SingleClassPost> {
                 if (isDisLike) {
                   int likeCount = int.parse(postData.likeCount);
                   likeCount--;
-                  print("object 543");
                   if (likeCount < 0) return;
                   await FirebaseDatabase.instance
                       .ref("${widget.path}/likeCount")
