@@ -75,6 +75,7 @@ class _SignInState extends State<SignIn> {
         child: LoadingAnimationWidget.staggeredDotsWave(
             color: Colors.blue, size: 40),
       );
+
       // TO DO : sign in with email and password and store data on firestore
       try {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -94,6 +95,7 @@ class _SignInState extends State<SignIn> {
             .set(model.toJson());
 
         await sentValidationEmail();
+
         Get.offAll(() => const InIt());
         accountGetController.signUp.value = const Center(
           child: Icon(Icons.done),
@@ -338,6 +340,8 @@ class _SignInState extends State<SignIn> {
                                 print(result.user!.email);
                               }
                             }
+
+                            await Future.delayed(const Duration(seconds: 1));
                             final user = FirebaseAuth.instance.currentUser!;
                             AccountModel accountModel = AccountModel(
                               userName: user.displayName!,

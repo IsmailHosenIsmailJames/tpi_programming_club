@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/views/accounts/account_info_controller.dart';
+import 'package:tpi_programming_club/app/views/accounts/init.dart';
 import 'package:tpi_programming_club/app/views/pages/home/home.dart';
 import 'package:tpi_programming_club/app/views/pages/settings/setting.dart';
 
@@ -333,6 +334,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   TextButton(
                     onPressed: () async {
                       await FirebaseAuth.instance.signOut();
+                      Get.offAll(() => const InIt());
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,

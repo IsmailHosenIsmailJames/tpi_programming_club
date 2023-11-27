@@ -36,11 +36,11 @@ class _HomePageState extends State<HomePage> {
         .ref('/user/${user.uid}/allowMessages')
         .get();
     AccountModel accountModel = AccountModel(
-      userName: user.displayName!,
+      userName: user.displayName ?? "userName",
       uid: user.uid,
-      userEmail: user.email!,
+      userEmail: user.email ?? "usermail@eamil.com",
       allowMessages: allowMessagesData.value == true ? true : false,
-      img: user.photoURL == null ? "null" : user.photoURL!,
+      img: user.photoURL ?? "null",
       posts: [],
       followers: [],
     );

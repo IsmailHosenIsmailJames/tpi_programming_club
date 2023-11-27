@@ -1,6 +1,7 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'add_remove_for_send_message.dart';
 
 class MessagesPage extends StatefulWidget {
   const MessagesPage({super.key});
@@ -26,7 +27,6 @@ class _MessagesPageState extends State<MessagesPage> {
                 const EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
             scrollDirection: Axis.horizontal,
             children: [
-              // FutureBuilder(future: FirebaseDatabase.instance.ref(""), builder: builder),
               Container(
                 height: 65,
                 width: 65,
@@ -36,7 +36,9 @@ class _MessagesPageState extends State<MessagesPage> {
                 ),
                 child: Center(
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(() => const AddOrRemoveForSendMessage());
+                    },
                     icon: const Icon(
                       Icons.edit,
                       size: 35,
