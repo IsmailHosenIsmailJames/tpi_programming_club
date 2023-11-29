@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:timezone/data/latest.dart';
 import 'package:tpi_programming_club/app/views/accounts/init.dart';
 
 import 'app/themes/app_theme_data.dart';
@@ -11,7 +12,7 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  initializeTimeZones();
   await Hive.initFlutter();
   await Hive.openBox('tpi_programming_club');
 

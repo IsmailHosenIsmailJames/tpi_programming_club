@@ -234,14 +234,17 @@ class _AddOrRemoveForSendMessageState extends State<AddOrRemoveForSendMessage> {
     if (data.exists && data.value != null) {
       Map<String, dynamic> dataMap =
           Map<String, dynamic>.from(jsonDecode(jsonEncode(data.value)));
+      List<String> keySortedList = dataMap.keys.toList()..sort();
 
-      dataMap.forEach((key, value) async {
-        final x = await FirebaseDatabase.instance.ref("/user/$key/").get();
+      for (int index = 0; index < keySortedList.length; index++) {
+        final x = await FirebaseDatabase.instance
+            .ref("/user/${keySortedList[index]}/")
+            .get();
         if (x.exists && x.value != null) {
           allowed.add(x.value);
-          allowedUID.add(key);
+          allowedUID.add(keySortedList[index]);
         }
-      });
+      }
     }
     final added = await FirebaseDatabase.instance
         .ref(
@@ -250,15 +253,17 @@ class _AddOrRemoveForSendMessageState extends State<AddOrRemoveForSendMessage> {
     if (added.exists && added.value != null) {
       Map<String, dynamic> addedMap =
           Map<String, dynamic>.from(jsonDecode(jsonEncode(added.value)));
-      addedMap.forEach((key, value) async {
-        final x = await FirebaseDatabase.instance.ref("/user/$key/").get();
+      List<String> keySortedList = addedMap.keys.toList()..sort();
+      for (int index = 0; index < keySortedList.length; index++) {
+        final x = await FirebaseDatabase.instance
+            .ref("/user/${keySortedList[index]}/")
+            .get();
         if (x.exists && x.value != null) {
           alredyAdded.add(x.value);
-          addedUID.add(key);
+          addedUID.add(keySortedList[index]);
         }
-      });
+      }
     }
-    await Future.delayed(const Duration(seconds: 2));
     setState(() {
       allowed;
       alredyAdded;
