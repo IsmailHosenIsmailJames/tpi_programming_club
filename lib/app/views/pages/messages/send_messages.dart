@@ -43,6 +43,7 @@ class _SendMessagesState extends State<SendMessages> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Container(
+                width: MediaQuery.of(context).size.width * 0.70,
                 margin: const EdgeInsets.all(5),
                 padding: const EdgeInsets.all(5),
                 decoration: const BoxDecoration(
@@ -78,6 +79,7 @@ class _SendMessagesState extends State<SendMessages> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
+                width: MediaQuery.of(context).size.width * 0.70,
                 margin: const EdgeInsets.all(5),
                 padding: const EdgeInsets.all(5),
                 decoration: const BoxDecoration(
@@ -124,7 +126,7 @@ class _SendMessagesState extends State<SendMessages> {
       ),
       drawer: const HomeDrawer(),
       body: Padding(
-        padding: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.only(bottom: 10, left: 5, right: 5),
         child: Column(
           children: [
             Expanded(
