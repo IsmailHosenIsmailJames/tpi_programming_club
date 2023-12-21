@@ -59,8 +59,8 @@ dependencies:
   font_awesome_flutter: ^10.6.0
   markdown: ^7.1.1
   cloud_firestore: ^4.11.0
-  flutter_quill: ^8.1.1
-  fl_chart: ^0.64.0
+  flutter_quill: ^9.1.0
+  fl_chart: ^0.65.0
   code_text_field: ^1.1.0
   youtube_player_flutter: ^8.1.2
   http: ^1.1.0
@@ -92,6 +92,12 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  
+  fonts:
+    - family: SF-UI-Display
+      fonts:
+        - asset: assets/fonts/SF-Pro-Display-Regular.otf
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -123,3 +129,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  

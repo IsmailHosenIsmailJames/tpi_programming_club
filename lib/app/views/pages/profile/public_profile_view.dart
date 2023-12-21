@@ -10,7 +10,7 @@ class PublicProfileView extends StatefulWidget {
 class _PublicProfileViewState extends State<PublicProfileView> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Text("data"),
     );
   }

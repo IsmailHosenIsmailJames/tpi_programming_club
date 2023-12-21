@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/cupertino.dart';
@@ -55,39 +57,81 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(left: 3, right: 3),
-            child: QuillProvider(
-              configurations:
-                  QuillConfigurations(controller: temQuillController),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () {
-                          postData[index] = {
-                            "type": "quill",
-                            "data":
-                                temQuillController.document.toDelta().toJson()
-                          };
-                          postPreview = createWidget(postData);
-                          setState(() {
-                            postData;
-                          });
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(Icons.done),
-                      ),
-                    ],
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Spacer(),
+                    IconButton(
+                      onPressed: () {
+                        postData[index] = {
+                          "type": "quill",
+                          "data": temQuillController.document.toDelta().toJson()
+                        };
+                        postPreview = createWidget(postData);
+                        setState(() {
+                          postData;
+                        });
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.done),
+                    ),
+                  ],
+                ),
+                const Divider(),
+                const SizedBox(
+                  height: 5,
+                ),
+                Expanded(
+                  child: QuillEditor(
+                    scrollController: ScrollController(),
+                    focusNode: FocusNode(),
+                    configurations: QuillEditorConfigurations(
+                            controller: temQuillController)
+                        .copyWith(
+                            elementOptions: const QuillEditorElementOptions(
+                              codeBlock: QuillEditorCodeBlockElementOptions(
+                                enableLineNumbers: true,
+                              ),
+                              orderedList: QuillEditorOrderedListElementOptions(
+                                customWidget: Icon(Icons.add),
+                              ),
+                              unorderedList:
+                                  QuillEditorUnOrderedListElementOptions(
+                                useTextColorForDot: true,
+                              ),
+                            ),
+                            customStyles: const DefaultStyles(
+                              h1: DefaultTextBlockStyle(
+                                TextStyle(
+                                  fontSize: 32,
+                                  height: 1.15,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                                VerticalSpacing(16, 0),
+                                VerticalSpacing(0, 0),
+                                null,
+                              ),
+                              sizeSmall: TextStyle(fontSize: 9),
+                              subscript: TextStyle(
+                                fontFamily: 'SF-UI-Display',
+                                fontFeatures: [FontFeature.subscripts()],
+                              ),
+                              superscript: TextStyle(
+                                fontFamily: 'SF-UI-Display',
+                                fontFeatures: [FontFeature.superscripts()],
+                              ),
+                            ),
+                            scrollable: true,
+                            placeholder: 'Start writting your post...',
+                            readOnly: false),
                   ),
-                  const Divider(),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Expanded(child: QuillEditor.basic()),
-                  const QuillToolbar()
-                ],
-              ),
+                ),
+                QuillToolbar.simple(
+                  configurations: QuillSimpleToolbarConfigurations(
+                      controller: temQuillController),
+                ),
+              ],
             ),
           ),
         ),
@@ -160,18 +204,14 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
     final quillData = partOfData['data'];
     return Row(
       children: [
-        QuillProvider(
-          configurations: QuillConfigurations(
-            controller: QuillController(
-              document: Document.fromJson(quillData),
-              selection: const TextSelection(baseOffset: 0, extentOffset: 0),
-            ),
-          ),
-          child: Expanded(
-            child: QuillEditor.basic(
-              configurations: const QuillEditorConfigurations(
-                readOnly: true,
+        Expanded(
+          child: QuillEditor.basic(
+            configurations: QuillEditorConfigurations(
+              controller: QuillController(
+                document: Document.fromJson(quillData),
+                selection: const TextSelection(baseOffset: 0, extentOffset: 0),
               ),
+              readOnly: true,
             ),
           ),
         ),
@@ -689,41 +729,77 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
         ],
       ),
       drawer: const HomeDrawer(),
-      body: QuillProvider(
-        configurations: QuillConfigurations(controller: quillEditorController),
-        child: ListView(
-          reverse: true,
-          children: [
-            const QuillToolbar(
-              configurations: QuillToolbarConfigurations(),
+      body: ListView(
+        reverse: true,
+        children: [
+          QuillToolbar.simple(
+            configurations: QuillSimpleToolbarConfigurations(
+              controller: quillEditorController,
             ),
-            const SizedBox(
-              height: 5,
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Container(
+            margin: const EdgeInsets.all(2),
+            padding:
+                const EdgeInsets.only(top: 10, left: 2, right: 2, bottom: 10),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: const Color.fromARGB(80, 116, 116, 116)),
+            child: QuillEditor(
+              scrollController: ScrollController(),
+              focusNode: FocusNode(),
+              configurations: QuillEditorConfigurations(
+                      controller: quillEditorController)
+                  .copyWith(
+                      elementOptions: const QuillEditorElementOptions(
+                        codeBlock: QuillEditorCodeBlockElementOptions(
+                          enableLineNumbers: true,
+                        ),
+                        orderedList: QuillEditorOrderedListElementOptions(
+                          customWidget: Icon(Icons.add),
+                        ),
+                        unorderedList: QuillEditorUnOrderedListElementOptions(
+                          useTextColorForDot: true,
+                        ),
+                      ),
+                      customStyles: const DefaultStyles(
+                        h1: DefaultTextBlockStyle(
+                          TextStyle(
+                            fontSize: 32,
+                            height: 1.15,
+                            fontWeight: FontWeight.w300,
+                          ),
+                          VerticalSpacing(16, 0),
+                          VerticalSpacing(0, 0),
+                          null,
+                        ),
+                        sizeSmall: TextStyle(fontSize: 9),
+                        subscript: TextStyle(
+                          fontFamily: 'SF-UI-Display',
+                          fontFeatures: [FontFeature.subscripts()],
+                        ),
+                        superscript: TextStyle(
+                          fontFamily: 'SF-UI-Display',
+                          fontFeatures: [FontFeature.superscripts()],
+                        ),
+                      ),
+                      scrollable: true,
+                      placeholder: 'Start writting your post...',
+                      readOnly: false),
             ),
-            Container(
-              margin: const EdgeInsets.all(2),
-              padding:
-                  const EdgeInsets.only(top: 10, left: 2, right: 2, bottom: 10),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: const Color.fromARGB(80, 116, 116, 116)),
-              child: QuillEditor.basic(
-                configurations: const QuillEditorConfigurations(
-                  readOnly: false,
-                ),
-              ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: const Color.fromARGB(80, 116, 116, 116)),
+            child: Column(
+              children: postPreview,
             ),
-            Container(
-              margin: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: const Color.fromARGB(80, 116, 116, 116)),
-              child: Column(
-                children: postPreview,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

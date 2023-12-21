@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:code_text_field/code_text_field.dart';
@@ -50,17 +51,50 @@ class CreatePostViewQuill {
 
   Widget addQuillWidgetDataToPost(Map<String, dynamic> partOfData, int i) {
     final quillData = partOfData['data'];
-    return QuillProvider(
-      configurations: QuillConfigurations(
+    return QuillEditor(
+      scrollController: ScrollController(),
+      focusNode: FocusNode(),
+      configurations: QuillEditorConfigurations(
+        readOnly: true,
         controller: QuillController(
           document: Document.fromJson(quillData),
           selection: const TextSelection(baseOffset: 0, extentOffset: 0),
         ),
-      ),
-      child: QuillEditor.basic(
-        configurations: const QuillEditorConfigurations(
-          readOnly: true,
+      ).copyWith(
+        elementOptions: const QuillEditorElementOptions(
+          codeBlock: QuillEditorCodeBlockElementOptions(
+            enableLineNumbers: true,
+          ),
+          orderedList: QuillEditorOrderedListElementOptions(
+            customWidget: Icon(Icons.add),
+          ),
+          unorderedList: QuillEditorUnOrderedListElementOptions(
+            useTextColorForDot: true,
+          ),
         ),
+        customStyles: const DefaultStyles(
+          h1: DefaultTextBlockStyle(
+            TextStyle(
+              fontSize: 32,
+              height: 1.15,
+              fontWeight: FontWeight.w300,
+            ),
+            VerticalSpacing(16, 0),
+            VerticalSpacing(0, 0),
+            null,
+          ),
+          sizeSmall: TextStyle(fontSize: 9),
+          subscript: TextStyle(
+            fontFamily: 'SF-UI-Display',
+            fontFeatures: [FontFeature.subscripts()],
+          ),
+          superscript: TextStyle(
+            fontFamily: 'SF-UI-Display',
+            fontFeatures: [FontFeature.superscripts()],
+          ),
+        ),
+        scrollable: true,
+        placeholder: 'Start writting your post...',
       ),
     );
   }
