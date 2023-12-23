@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tpi_programming_club/app/themes/const_theme_data.dart';
@@ -8,7 +9,12 @@ import 'package:markdown_toolbar/markdown_toolbar.dart';
 import 'post_output_markdown.dart';
 
 class PostEditor extends StatefulWidget {
-  const PostEditor({super.key, required this.name, required this.id});
+  const PostEditor(
+      {super.key,
+      required this.name,
+      required this.id,
+      required this.previousMardown});
+  final String previousMardown;
   final String name;
   final String id;
 
@@ -25,6 +31,7 @@ class _PostEditorState extends State<PostEditor> {
   void initState() {
     _controller.addListener(() => setState(() {}));
     _focusNode = FocusNode();
+    _controller.text = widget.previousMardown;
 
     super.initState();
   }
@@ -46,6 +53,17 @@ class _PostEditorState extends State<PostEditor> {
           ElevatedButton(
             onPressed: () {
               if (_fromKey.currentState!.validate()) {
+                Get.back(result: _controller.text);
+              }
+            },
+            child: const Icon(Icons.done),
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (_fromKey.currentState!.validate()) {
                 Get.to(
                   () => MarkDownOutPut(
                     markdown: _controller.text,
@@ -55,14 +73,7 @@ class _PostEditorState extends State<PostEditor> {
                 );
               }
             },
-            style: ElevatedButton.styleFrom(
-              shadowColor: Colors.transparent,
-              backgroundColor: ConstantThemeData().primaryColour,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(100),
-              ),
-            ),
-            child: const Icon(Icons.forward),
+            child: const Icon(FontAwesomeIcons.eye),
           ),
         ],
       ),
@@ -80,9 +91,10 @@ class _PostEditorState extends State<PostEditor> {
                 collapsable: false,
                 width: 40,
                 height: 30,
+                alignment: WrapAlignment.center,
               ),
               const SizedBox(
-                height: 2,
+                height: 5,
               ),
               Form(
                 key: _fromKey,
@@ -93,7 +105,7 @@ class _PostEditorState extends State<PostEditor> {
                       textStyle: Theme.of(context).textTheme.bodyLarge),
                   controller: _controller,
                   focusNode: _focusNode,
-                  minLines: 5,
+                  minLines: 1,
                   decoration: InputDecoration(
                     labelText: "Markdown",
                     labelStyle: TextStyle(

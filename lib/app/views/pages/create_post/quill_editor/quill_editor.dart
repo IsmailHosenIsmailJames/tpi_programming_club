@@ -5,12 +5,14 @@ import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:tpi_programming_club/app/core/image_picker.dart';
 import 'package:tpi_programming_club/app/core/show_toast_meassage.dart';
+import 'package:tpi_programming_club/app/views/pages/create_post/markdown/create_post_markdown.dart';
 import 'package:tpi_programming_club/app/views/pages/create_post/quill_editor/code/edit_code.dart';
 import 'package:tpi_programming_club/app/views/pages/create_post/quill_editor/preview_of_post_quill.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
@@ -218,6 +220,14 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
           widgetList.add(youtubeWidget);
         } else {
           showToast("Youtube video link is not valid");
+        }
+      } else if (partOfData['type'] == 'markdown') {
+        String data = partOfData['data'];
+        if (data.isNotEmpty) {
+          Widget markdown = addMarkdownWidget(data, i);
+          widgetList.add(markdown);
+        } else {
+          showToast("Markdown text is empty");
         }
       }
     }
@@ -487,28 +497,73 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
+        SizedBox(
+          height: 410,
+          child: MarkdownWidget(
+            data:
+                """[![https://www.youtube.com/watch?v=$videoID](https://img.youtube.com/vi/$videoID/0.jpg)](https://www.youtube.com/watch?v=$videoID)
+              **Click here to watch the video!**""",
+          ),
+        ),
         Container(
           margin: const EdgeInsets.only(top: 5, bottom: 5),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: const Color.fromARGB(80, 113, 113, 113),
+            borderRadius: BorderRadius.circular(100),
+            color: const Color.fromARGB(99, 72, 202, 76),
           ),
-          child: Container(
-            margin: const EdgeInsets.all(5),
-            height: 410,
-            // width: 700,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: const Color.fromARGB(80, 113, 113, 113),
-            ),
-            child: Expanded(
-              child: MarkdownWidget(
-                data:
-                    """[![https://www.youtube.com/watch?v=$videoID](https://img.youtube.com/vi/$videoID/0.jpg)](https://www.youtube.com/watch?v=$videoID)
-              **Click here to watch the video!**""",
+          child: PopupMenuButton(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                onTap: () => deletePartOfPost(i),
+                child: const Row(children: [
+                  Icon(Icons.delete),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("delete"),
+                ]),
               ),
-            ),
+              PopupMenuItem(
+                onTap: () => moveUp(i),
+                child: const Row(children: [
+                  Icon(Icons.arrow_upward),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("Move Up"),
+                ]),
+              ),
+              PopupMenuItem(
+                onTap: () => moveDown(i),
+                child: const Row(
+                  children: [
+                    Icon(Icons.arrow_downward),
+                    SizedBox(
+                      width: 2,
+                    ),
+                    Text("Move down"),
+                  ],
+                ),
+              ),
+            ],
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget addMarkdownWidget(String markdown, int i) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        SizedBox(
+          height: 400,
+          child: MarkdownWidget(
+            data: markdown,
+          ),
+        ),
+        const SizedBox(
+          height: 5,
         ),
         Container(
           margin: const EdgeInsets.all(1),
@@ -518,6 +573,32 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
           ),
           child: PopupMenuButton(
             itemBuilder: (context) => [
+              PopupMenuItem(
+                onTap: () async {
+                  final modifiedMarkdown = await Get.to(
+                    () => PostEditor(
+                      name: widget.name,
+                      id: widget.id,
+                      previousMardown: markdown,
+                    ),
+                  );
+                  postData[i] = {
+                    "type": "markdown",
+                    "data": modifiedMarkdown,
+                  };
+                  postPreview = createWidget(postData);
+                  setState(() {
+                    postData;
+                  });
+                },
+                child: const Row(children: [
+                  Icon(Icons.edit),
+                  SizedBox(
+                    width: 2,
+                  ),
+                  Text("Edit"),
+                ]),
+              ),
               PopupMenuItem(
                 onTap: () => deletePartOfPost(i),
                 child: const Row(children: [
@@ -734,6 +815,45 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
                       width: 4,
                     ),
                     Text("Youtube Video"),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                onTap: () async {
+                  if (quillEditorController.document.toPlainText() != "\n") {
+                    addQuillDataToPost(
+                      quillEditorController.document.toDelta().toJson(),
+                    );
+                    quillEditorController.clear();
+                  }
+                  String? markdownText = await Get.to(
+                    () => PostEditor(
+                      name: widget.name,
+                      id: widget.id,
+                      previousMardown: "",
+                    ),
+                  );
+                  if (markdownText == null) return;
+                  final data = {
+                    "type": "markdown",
+                    "data": markdownText,
+                  };
+
+                  setState(() {
+                    postData.add(data);
+                  });
+                  postPreview = createWidget(postData);
+                  setState(() {
+                    postPreview;
+                  });
+                },
+                child: const Row(
+                  children: [
+                    Icon(FontAwesomeIcons.markdown),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text("Add Markdown"),
                   ],
                 ),
               ),

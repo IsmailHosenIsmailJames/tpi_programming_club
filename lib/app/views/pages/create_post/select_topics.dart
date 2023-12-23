@@ -9,11 +9,11 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/views/pages/create_post/create_topics.dart';
+import 'package:tpi_programming_club/app/views/pages/create_post/quill_editor/quill_editor.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 
 import '../../../themes/app_theme_data.dart';
 import '../../../data/models/topics_model.dart';
-import 'select_editing_tools.dart';
 
 class SelectTopics extends StatefulWidget {
   const SelectTopics({super.key});
@@ -161,7 +161,7 @@ class _SelectTopicsState extends State<SelectTopics> {
                             String name = listOfTopics[index].name;
                             String id = listOfTopics[index].id;
                             Get.to(
-                              SelectEditingTools(
+                              MyQuillEditor(
                                 name: name,
                                 id: id,
                               ),
