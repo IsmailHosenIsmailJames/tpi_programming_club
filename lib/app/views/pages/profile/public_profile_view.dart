@@ -36,12 +36,14 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
               color: Colors.green.shade300,
             ),
             child: userModel.img == 'null'
-                ? Text(
-                    userModel.userName.substring(0, 2),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
+                ? Center(
+                    child: Text(
+                      userModel.userName.substring(0, 2),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   )
                 : ClipRRect(

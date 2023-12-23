@@ -36,12 +36,14 @@ class _ProfilePageState extends State<ProfilePage> {
               color: Colors.green.shade300,
             ),
             child: accountInfo.img.value == 'null'
-                ? Text(
-                    accountInfo.name.value.substring(0, 2),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
+                ? Center(
+                    child: Text(
+                      accountInfo.name.value.substring(0, 2),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   )
                 : ClipRRect(

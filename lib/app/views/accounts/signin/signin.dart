@@ -258,6 +258,7 @@ class _SignInState extends State<SignIn> {
                           controller: password,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           focusNode: passwordFocusNode,
+                          obscureText: true,
                           decoration: InputDecoration(
                             focusedBorder:
                                 ConstantThemeData().onFocusOutlineInputBorder,
@@ -287,6 +288,7 @@ class _SignInState extends State<SignIn> {
                           controller: confirmPass,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           focusNode: confirmFocusNode,
+                          obscureText: true,
                           decoration: InputDecoration(
                             focusedBorder:
                                 ConstantThemeData().onFocusOutlineInputBorder,

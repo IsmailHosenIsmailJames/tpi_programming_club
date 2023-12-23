@@ -204,6 +204,7 @@ class _LogInState extends State<LogIn> {
                             }
                           },
                           controller: password,
+                          obscureText: true,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           focusNode: passwordFocusNode,
                           decoration: InputDecoration(
