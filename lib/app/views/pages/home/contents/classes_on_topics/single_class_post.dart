@@ -5,10 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:markdown_widget/markdown_widget.dart';
 import 'package:tpi_programming_club/app/views/accounts/account_info_controller.dart';
 import 'package:tpi_programming_club/app/views/pages/create_post/quill_editor/create_post_view_quill.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
@@ -348,10 +348,21 @@ class _SingleClassPostState extends State<SingleClassPost> {
             post = CreatePostViewQuill().createWidgetFromString(contentData);
           });
         } else {
+          TocController tocController = TocController();
           setState(() {
             post = [
-              MarkdownBody(
-                data: contentData,
+              Row(
+                children: [
+                  Expanded(
+                    child: TocWidget(controller: tocController),
+                  ),
+                  Expanded(
+                    child: MarkdownWidget(
+                      data: contentData,
+                      tocController: tocController,
+                    ),
+                  ),
+                ],
               )
             ];
           });

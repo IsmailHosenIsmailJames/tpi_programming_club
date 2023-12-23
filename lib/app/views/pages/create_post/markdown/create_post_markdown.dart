@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tpi_programming_club/app/themes/const_theme_data.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
+import 'package:markdown_toolbar/markdown_toolbar.dart';
 
 import 'post_output_markdown.dart';
 
@@ -16,8 +17,26 @@ class PostEditor extends StatefulWidget {
 }
 
 class _PostEditorState extends State<PostEditor> {
-  TextEditingController editorController = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
+  late final FocusNode _focusNode;
+
   final _fromKey = GlobalKey<FormState>();
+  @override
+  void initState() {
+    _controller.addListener(() => setState(() {}));
+    _focusNode = FocusNode();
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +48,7 @@ class _PostEditorState extends State<PostEditor> {
               if (_fromKey.currentState!.validate()) {
                 Get.to(
                   () => MarkDownOutPut(
-                    markdown: editorController.text,
+                    markdown: _controller.text,
                     name: widget.name,
                     id: widget.id,
                   ),
@@ -54,25 +73,27 @@ class _PostEditorState extends State<PostEditor> {
           child: ListView(
             reverse: true,
             children: [
+              MarkdownToolbar(
+                useIncludedTextField: false,
+                controller: _controller,
+                focusNode: _focusNode,
+                collapsable: false,
+                width: 40,
+                height: 30,
+              ),
               const SizedBox(
                 height: 2,
               ),
               Form(
                 key: _fromKey,
-                child: TextFormField(
+                child: TextField(
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   style: GoogleFonts.firaMono(
                       textStyle: Theme.of(context).textTheme.bodyLarge),
-                  controller: editorController,
-                  validator: (value) {
-                    if (value!.isNotEmpty) {
-                      return null;
-                    } else {
-                      return "Can't be empty...";
-                    }
-                  },
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  minLines: 5,
                   decoration: InputDecoration(
                     labelText: "Markdown",
                     labelStyle: TextStyle(
