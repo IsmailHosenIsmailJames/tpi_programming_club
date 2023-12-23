@@ -8,6 +8,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:markdown_widget/markdown_widget.dart';
 import 'package:tpi_programming_club/app/core/image_picker.dart';
 import 'package:tpi_programming_club/app/core/show_toast_meassage.dart';
 import 'package:tpi_programming_club/app/views/pages/create_post/quill_editor/code/edit_code.dart';
@@ -17,8 +18,6 @@ import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 // ignore: depend_on_referenced_packages
 import 'package:highlight/languages/all.dart';
-import 'package:http/http.dart' as http;
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../../../themes/const_theme_data.dart';
 
@@ -44,6 +43,29 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
     setState(() {
       postData;
     });
+  }
+
+  static String? convertYoytubeVideoUrlToId(String url,
+      {bool trimWhitespaces = true}) {
+    if (!url.contains("http") && (url.length == 11)) return url;
+    if (trimWhitespaces) url = url.trim();
+
+    for (var exp in [
+      RegExp(
+          r"^https:\/\/(?:www\.|m\.)?youtube\.com\/watch\?v=([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(
+          r"^https:\/\/(?:music\.)?youtube\.com\/watch\?v=([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(
+          r"^https:\/\/(?:www\.|m\.)?youtube\.com\/shorts\/([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(
+          r"^https:\/\/(?:www\.|m\.)?youtube(?:-nocookie)?\.com\/embed\/([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(r"^https:\/\/youtu\.be\/([_\-a-zA-Z0-9]{11}).*$")
+    ]) {
+      Match? match = exp.firstMatch(url);
+      if (match != null && match.groupCount >= 1) return match.group(1);
+    }
+
+    return null;
   }
 
   void editQuillPartOfPost(int index) {
@@ -190,10 +212,12 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
         widgetList.add(imgWidget);
       } else if (partOfData['type'] == 'youtube') {
         String url = partOfData['data'];
-        String? videoID = YoutubePlayer.convertUrlToId(url);
+        String? videoID = convertYoytubeVideoUrlToId(url);
         if (videoID != null) {
           Widget youtubeWidget = addYoutubeVideoWidget(videoID, i);
           widgetList.add(youtubeWidget);
+        } else {
+          showToast("Youtube video link is not valid");
         }
       }
     }
@@ -460,14 +484,6 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
   }
 
   Widget addYoutubeVideoWidget(String videoID, int i) {
-    YoutubePlayerController controller = YoutubePlayerController(
-      initialVideoId: videoID,
-      flags: const YoutubePlayerFlags(
-        autoPlay: false,
-        hideControls: false,
-      ),
-    );
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -477,12 +493,20 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
             borderRadius: BorderRadius.circular(20),
             color: const Color.fromARGB(80, 113, 113, 113),
           ),
-          child: YoutubePlayer(
-            controller: controller,
-            showVideoProgressIndicator: true,
-            progressColors: const ProgressBarColors(
-              playedColor: Colors.blue,
-              handleColor: Colors.green,
+          child: Container(
+            margin: const EdgeInsets.all(5),
+            height: 410,
+            // width: 700,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: const Color.fromARGB(80, 113, 113, 113),
+            ),
+            child: Expanded(
+              child: MarkdownWidget(
+                data:
+                    """[![https://www.youtube.com/watch?v=$videoID](https://img.youtube.com/vi/$videoID/0.jpg)](https://www.youtube.com/watch?v=$videoID)
+              **Click here to watch the video!**""",
+              ),
             ),
           ),
         ),
@@ -660,7 +684,7 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
                                 if (value!.length > 5) {
                                   return null;
                                 } else {
-                                  return "Your email is not correct...";
+                                  return "Your link is not valid";
                                 }
                               },
                               decoration: InputDecoration(
@@ -681,29 +705,18 @@ class _MyQuillEditorState extends State<MyQuillEditor> {
                             ),
                             ElevatedButton.icon(
                               onPressed: () async {
-                                try {
-                                  http.Response urlResponse = await http.head(
-                                    Uri.parse(inputController.text),
-                                  );
-                                  if (urlResponse.statusCode == 200) {
-                                    final data = {
-                                      "type": "youtube",
-                                      "data": inputController.text,
-                                    };
-                                    postData.add(data);
-                                    setState(() {
-                                      postData;
-                                    });
-                                    postPreview = createWidget(postData);
-                                    setState(() {
-                                      postPreview;
-                                    });
-                                  } else {
-                                    showToast("Doesn't exits");
-                                  }
-                                } catch (e) {
-                                  showToast(e.toString());
-                                }
+                                final data = {
+                                  "type": "youtube",
+                                  "data": inputController.text,
+                                };
+                                postData.add(data);
+                                setState(() {
+                                  postData;
+                                });
+                                postPreview = createWidget(postData);
+                                setState(() {
+                                  postPreview;
+                                });
                               },
                               icon: const Icon(Icons.done),
                               label: const Text("ok"),

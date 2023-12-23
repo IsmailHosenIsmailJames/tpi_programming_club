@@ -61,7 +61,6 @@ dependencies:
   flutter_quill: ^9.1.0
   fl_chart: ^0.65.0
   code_text_field: ^1.1.0
-  youtube_player_flutter: ^8.1.2
   http: ^1.1.0
   google_sign_in: ^6.1.6
   flutter_facebook_auth: ^6.0.3

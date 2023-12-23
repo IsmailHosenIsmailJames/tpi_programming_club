@@ -11,7 +11,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 // ignore: depend_on_referenced_packages
 import 'package:highlight/languages/all.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:markdown_widget/markdown_widget.dart';
 
 class CreatePostViewQuill {
   List<Widget> createWidgetFromString(String data) {
@@ -22,6 +22,29 @@ class CreatePostViewQuill {
     }
 
     return createWidget(listOfMap);
+  }
+
+  static String? convertYoytubeVideoUrlToId(String url,
+      {bool trimWhitespaces = true}) {
+    if (!url.contains("http") && (url.length == 11)) return url;
+    if (trimWhitespaces) url = url.trim();
+
+    for (var exp in [
+      RegExp(
+          r"^https:\/\/(?:www\.|m\.)?youtube\.com\/watch\?v=([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(
+          r"^https:\/\/(?:music\.)?youtube\.com\/watch\?v=([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(
+          r"^https:\/\/(?:www\.|m\.)?youtube\.com\/shorts\/([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(
+          r"^https:\/\/(?:www\.|m\.)?youtube(?:-nocookie)?\.com\/embed\/([_\-a-zA-Z0-9]{11}).*$"),
+      RegExp(r"^https:\/\/youtu\.be\/([_\-a-zA-Z0-9]{11}).*$")
+    ]) {
+      Match? match = exp.firstMatch(url);
+      if (match != null && match.groupCount >= 1) return match.group(1);
+    }
+
+    return null;
   }
 
   List<Widget> createWidget(List<Map<String, dynamic>> data) {
@@ -39,7 +62,7 @@ class CreatePostViewQuill {
         widgetList.add(imgWidget);
       } else if (partOfData['type'] == 'youtube') {
         String url = partOfData['data'];
-        String? videoID = YoutubePlayer.convertUrlToId(url);
+        String? videoID = convertYoytubeVideoUrlToId(url);
         if (videoID != null) {
           Widget youtubeWidget = addYoutubeVideoWidget(videoID, i);
           widgetList.add(youtubeWidget);
@@ -155,26 +178,18 @@ class CreatePostViewQuill {
   }
 
   Widget addYoutubeVideoWidget(String videoID, int i) {
-    YoutubePlayerController controller = YoutubePlayerController(
-      initialVideoId: videoID,
-      flags: const YoutubePlayerFlags(
-        autoPlay: false,
-        hideControls: false,
-      ),
-    );
-
     return Container(
-      margin: const EdgeInsets.only(top: 5, bottom: 5),
+      margin: const EdgeInsets.all(5),
+      height: 410,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: const Color.fromARGB(80, 113, 113, 113),
       ),
-      child: YoutubePlayer(
-        controller: controller,
-        showVideoProgressIndicator: true,
-        progressColors: const ProgressBarColors(
-          playedColor: Colors.blue,
-          handleColor: Colors.green,
+      child: Expanded(
+        child: MarkdownWidget(
+          data:
+              """[![https://www.youtube.com/watch?v=$videoID](https://img.youtube.com/vi/$videoID/0.jpg)](https://www.youtube.com/watch?v=$videoID)
+        **Click here to watch the video!**""",
         ),
       ),
     );
