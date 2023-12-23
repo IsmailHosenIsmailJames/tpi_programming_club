@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -32,19 +31,9 @@ Future<PickPhotoFileWithUrlMobile> pickPhotoMobile(String toUploadePath) async {
     final tem = result.files.first;
     String? extension = tem.extension;
     imageFile = File(tem.path!);
-
-    int randValue = Random().nextInt(1000000);
-    String imageName = "";
-    if (tem.path != null) {
-      imageName = tem.path!;
-      List<String> l = imageName.split('/');
-      imageName = l[l.length - 2];
-      if (imageName.length > 15) {
-        imageName = imageName.substring(0, 15);
-      }
-    }
-
-    String uploadePath = "$toUploadePath$randValue$imageName.$extension";
+    String imageName = tem.path!;
+    String uploadePath =
+        "$toUploadePath${DateTime.now().millisecondsSinceEpoch}$imageName.$extension";
     final ref = FirebaseStorage.instance.ref().child(uploadePath);
     UploadTask uploadTask;
     uploadTask = ref.putFile(imageFile);
@@ -67,7 +56,8 @@ Future<PickPhotoFileWithUrlWeb> pickPhotoWeb(String toUploadePath) async {
     final tem = result.files.first;
     selectedImage = tem.bytes;
     String? extension = tem.extension;
-    String uploadePath = "$toUploadePath.$extension";
+    String uploadePath =
+        "$toUploadePath${DateTime.now().millisecondsSinceEpoch}.$extension";
     final ref = FirebaseStorage.instance.ref().child(uploadePath);
     UploadTask uploadTask;
     final metadata = SettableMetadata(contentType: 'image/jpeg');

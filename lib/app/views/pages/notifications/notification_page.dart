@@ -12,9 +12,9 @@ class _NotificationPageState extends State<NotificationPage> {
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
-        "Notification",
+        "Notification : Under Developent",
         style: TextStyle(
-          fontSize: 40,
+          fontSize: 30,
           fontWeight: FontWeight.bold,
         ),
       ),

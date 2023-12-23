@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +12,7 @@ import 'package:tpi_programming_club/app/views/accounts/account_info_controller.
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:tpi_programming_club/app/views/pages/home/getx_controller.dart';
 import 'package:tpi_programming_club/app/views/pages/home/contents/home_content.dart';
-import 'package:tpi_programming_club/app/views/pages/messages/messages_page.dart';
+// import 'package:tpi_programming_club/app/views/pages/messages/messages_page.dart';
 import 'package:tpi_programming_club/app/views/pages/notifications/notification_page.dart';
 import 'package:tpi_programming_club/app/views/pages/profile/profile_page.dart';
 
@@ -32,17 +34,23 @@ class _HomePageState extends State<HomePage> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) return;
-    final allowMessagesData = await FirebaseDatabase.instance
-        .ref('/user/${user.uid}/allowMessages')
-        .get();
+    final userInformation =
+        await FirebaseDatabase.instance.ref('/user/${user.uid}').get();
+    Map<String, dynamic> mapUserInfo = Map<String, dynamic>.from(
+        jsonDecode(jsonEncode(userInformation.value)));
+    bool allowMessagesData = mapUserInfo['allowMessages'] ?? false;
+
+    await FirebaseDatabase.instance
+        .ref('/user/${user.uid}/lastActive')
+        .set(DateTime.now().millisecondsSinceEpoch);
     AccountModel accountModel = AccountModel(
       userName: user.displayName ?? "userName",
       uid: user.uid,
       userEmail: user.email ?? "usermail@eamil.com",
-      allowMessages: allowMessagesData.value == true ? true : false,
+      allowMessages: allowMessagesData == true ? true : false,
       img: user.photoURL ?? "null",
-      posts: [],
-      followers: [],
+      followers: ['followers'],
+      posts: mapUserInfo['posts'] ?? [],
     );
     accountInfoController.name.value = accountModel.userName;
     accountInfoController.email.value = accountModel.userEmail;
@@ -76,7 +84,7 @@ class _HomePageState extends State<HomePage> {
           margin: const EdgeInsets.all(5),
           screens: const [
             HomePageContent(),
-            MessagesPage(),
+            // MessagesPage(),
             NotificationPage(),
             ProfilePage(),
           ],
@@ -93,18 +101,18 @@ class _HomePageState extends State<HomePage> {
                 homeControllersGet.changePageName("Home");
               },
             ),
-            PersistentBottomNavBarItem(
-              textStyle: const TextStyle(fontWeight: FontWeight.bold),
-              activeColorPrimary: Colors.orange,
-              activeColorSecondary: Colors.deepOrange,
-              inactiveColorPrimary: Colors.green,
-              icon: const Icon(Icons.message),
-              title: "Messages",
-              onPressed: (p0) {
-                _controller.index = 1;
-                homeControllersGet.changePageName("Messages");
-              },
-            ),
+            // PersistentBottomNavBarItem(
+            //   textStyle: const TextStyle(fontWeight: FontWeight.bold),
+            //   activeColorPrimary: Colors.orange,
+            //   activeColorSecondary: Colors.deepOrange,
+            //   inactiveColorPrimary: Colors.green,
+            //   icon: const Icon(Icons.message),
+            //   title: "Messages",
+            //   onPressed: (p0) {
+            //     _controller.index = 1;
+            //     homeControllersGet.changePageName("Messages");
+            //   },
+            // ),
             PersistentBottomNavBarItem(
               textStyle: const TextStyle(fontWeight: FontWeight.bold),
               activeColorPrimary: Colors.orange,
@@ -113,7 +121,7 @@ class _HomePageState extends State<HomePage> {
               icon: const Icon(Icons.notifications_active_outlined),
               title: "Notification",
               onPressed: (p0) {
-                _controller.index = 2;
+                _controller.index = 1;
                 homeControllersGet.changePageName("Notifications");
               },
             ),
@@ -125,7 +133,7 @@ class _HomePageState extends State<HomePage> {
               icon: const Icon(Icons.person_outline),
               title: "Profile",
               onPressed: (p0) {
-                _controller.index = 3;
+                _controller.index = 2;
                 homeControllersGet.changePageName("Profile");
               },
             ),

@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:timezone/data/latest.dart';
 import 'package:tpi_programming_club/app/views/accounts/init.dart';
-import 'package:tpi_programming_club/app/views/pages/create_post/quill_editor/quill_editor.dart';
 
 import 'app/themes/app_theme_data.dart';
 import 'app/views/pages/home/getx_controller.dart';
@@ -59,7 +58,7 @@ class MyApp extends StatelessWidget {
         Get.put(HomeGetController());
         controller.initTheme();
       },
-      home: const MyQuillEditor(name: "", id: ""),
+      home: const InIt(),
     );
   }
 }
