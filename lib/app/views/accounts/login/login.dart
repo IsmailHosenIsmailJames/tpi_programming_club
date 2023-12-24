@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -9,7 +11,6 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/data/models/account_model.dart';
-import 'package:tpi_programming_club/app/views/accounts/login_widget_controller.dart';
 
 import '../../../themes/const_theme_data.dart';
 import '../../../themes/app_theme_data.dart';
@@ -28,8 +29,6 @@ class _LogInState extends State<LogIn> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   final validationKey = GlobalKey<FormState>();
-  final AccountWidgetController accountGetController =
-      Get.put(AccountWidgetController());
 
   Future<UserCredential> signInWithGoogleAndroid() async {
     // Trigger the authentication flow
@@ -65,18 +64,28 @@ class _LogInState extends State<LogIn> {
 
   void logIn() async {
     if (validationKey.currentState!.validate()) {
-      accountGetController.signUp.value = Center(
-        child: LoadingAnimationWidget.staggeredDotsWave(
-            color: Colors.blue, size: 40),
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => Center(
+          child: LoadingAnimationWidget.staggeredDotsWave(
+              color: Colors.blue, size: 40),
+        ),
       );
       // TO DO : login on firebase
       try {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: email.text.trim(), password: password.text);
         Get.offAll(() => const InIt());
-        accountGetController.login.value = const Center(
-          child: Icon(Icons.done),
-        );
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+          showModalBottomSheet(
+            context: context,
+            builder: (context) => const Center(
+              child: Icon(Icons.done),
+            ),
+          );
+        }
+        return;
       } on FirebaseAuthException catch (e) {
         Fluttertoast.showToast(
           msg: e.message!,
@@ -86,12 +95,18 @@ class _LogInState extends State<LogIn> {
           timeInSecForIosWeb: 5,
         );
       }
-      accountGetController.login.value = const Center(
-        child: Text(
-          "LogIn failed, try again",
-          style: TextStyle(fontSize: 20, color: Colors.deepOrange),
-        ),
-      );
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+        showModalBottomSheet(
+          context: context,
+          builder: (context) => const Center(
+            child: Text(
+              "LogIn failed, try again",
+              style: TextStyle(fontSize: 20, color: Colors.deepOrange),
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -220,21 +235,24 @@ class _LogInState extends State<LogIn> {
                         const SizedBox(
                           height: 15,
                         ),
-                        Obx(
-                          () => ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              maximumSize: const Size(380, 50),
-                              minimumSize: const Size(380, 50),
-                              backgroundColor:
-                                  ConstantThemeData().primaryColour,
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
                             ),
-                            onPressed: () {
-                              logIn();
-                            },
-                            child: accountGetController.login.value,
+                            maximumSize: const Size(380, 50),
+                            minimumSize: const Size(380, 50),
+                            backgroundColor: ConstantThemeData().primaryColour,
+                          ),
+                          onPressed: () {
+                            logIn();
+                          },
+                          child: const Text(
+                            "LogIn",
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -293,7 +311,7 @@ class _LogInState extends State<LogIn> {
                             const Text("Haven't account?"),
                             TextButton(
                               onPressed: () {
-                                Get.to(() => const SignIn());
+                                Get.offAll(() => const SignIn());
                               },
                               child: Text(
                                 "Sign Up",

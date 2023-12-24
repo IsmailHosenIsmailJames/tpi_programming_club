@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +10,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/core/image_picker.dart';
 import 'package:tpi_programming_club/app/views/accounts/account_info_controller.dart';
-import 'package:tpi_programming_club/app/views/pages/create_post/publish_post/getx_publish_controller.dart';
 import 'package:tpi_programming_club/app/views/pages/home/home.dart';
 
 import '../../../../data/models/account_model.dart';
@@ -33,7 +34,6 @@ class PublishPost extends StatefulWidget {
 
 class _PublishPostState extends State<PublishPost> {
   String? owner = FirebaseAuth.instance.currentUser!.email;
-  final controller = Get.put(PublishPostControllerGetx());
   final accuntInfo = Get.put(AccountInfoController());
 
   final validationKey = GlobalKey<FormState>();
@@ -44,12 +44,26 @@ class _PublishPostState extends State<PublishPost> {
   String? title;
   String? description;
 
+  Widget imagePlacholder = const SizedBox(
+    child: Center(
+      child: Icon(Icons.add_photo_alternate_outlined),
+    ),
+  );
+  Widget loadingIconOnUploadIMage = const SizedBox(
+    child: Text("Choice an Image"),
+  );
+  Widget loadingIconOnPublishTopics = const SizedBox(
+    child: Text("Publish"),
+  );
+
   void publish() async {
     if (validationKey.currentState!.validate()) {
-      controller.loadingIconOnUploadeTopics.value = SizedBox(
-        child: LoadingAnimationWidget.staggeredDotsWave(
-            color: Colors.white, size: 40),
-      );
+      setState(() {
+        loadingIconOnPublishTopics = SizedBox(
+          child: LoadingAnimationWidget.staggeredDotsWave(
+              color: Colors.white, size: 40),
+        );
+      });
       final count =
           await FirebaseDatabase.instance.ref("/contents/count/").get();
       int id = 0;
@@ -139,13 +153,17 @@ class _PublishPostState extends State<PublishPost> {
       );
       accountModel.posts.add("/contents/$id/$classCount");
       await userRef.update(accountModel.toJson());
-      controller.loadingIconOnUploadeTopics.value = const SizedBox(
-        child: Text("Uploaded"),
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => const Center(
+          child: SizedBox(
+            child: Text("Uploaded"),
+          ),
+        ),
       );
 
-      Get.to(() => const HomePage());
+      Get.off(() => const HomePage());
 
-      // ignore: use_build_context_synchronously
       showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
@@ -185,16 +203,14 @@ class _PublishPostState extends State<PublishPost> {
                     ),
                   ),
                 ),
-                Obx(
-                  () => Container(
-                    height: 200,
-                    width: 200,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(83, 33, 149, 243),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: controller.imageWidget.value,
+                Container(
+                  height: 200,
+                  width: 200,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(83, 33, 149, 243),
+                    borderRadius: BorderRadius.circular(15),
                   ),
+                  child: imagePlacholder,
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -205,30 +221,34 @@ class _PublishPostState extends State<PublishPost> {
                     minimumSize: const Size(200, 35),
                   ),
                   onPressed: () async {
-                    controller.loadingIconOnUploadeImage.value = SizedBox(
-                      child: LoadingAnimationWidget.staggeredDotsWave(
-                          color: Colors.white, size: 40),
-                    );
+                    setState(() {
+                      loadingIconOnUploadIMage = SizedBox(
+                        child: LoadingAnimationWidget.staggeredDotsWave(
+                            color: Colors.white, size: 40),
+                      );
+                    });
 
                     int id = int.parse(widget.id);
 
                     PickPhotoFileWithUrlMobile img =
                         await pickPhotoMobile("/contents/$id/");
                     if (img.imageFile != null) {
-                      controller.imageWidget.value = SizedBox(
-                        child: Image.file(img.imageFile!, fit: BoxFit.cover),
-                      );
+                      setState(() {
+                        imagePlacholder = SizedBox(
+                          child: Image.file(img.imageFile!, fit: BoxFit.cover),
+                        );
+                      });
                     }
                     if (img.url != null) {
                       imgUrl = img.url!;
                     }
-                    controller.loadingIconOnUploadeImage.value = const SizedBox(
-                      child: Text("Choice an Image"),
-                    );
+                    setState(() {
+                      loadingIconOnUploadIMage = const SizedBox(
+                        child: Text("Choice an Image"),
+                      );
+                    });
                   },
-                  child: Obx(
-                    () => controller.loadingIconOnUploadeImage.value,
-                  ),
+                  child: loadingIconOnUploadIMage,
                 ),
                 Form(
                   key: validationKey,
@@ -302,20 +322,18 @@ class _PublishPostState extends State<PublishPost> {
                         const SizedBox(
                           height: 15,
                         ),
-                        Obx(
-                          () => ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              minimumSize: const Size(double.infinity, 50),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            onPressed: () async {
-                              publish();
-                            },
-                            child: controller.loadingIconOnUploadeTopics.value,
+                            minimumSize: const Size(double.infinity, 50),
                           ),
+                          onPressed: () async {
+                            publish();
+                          },
+                          child: loadingIconOnPublishTopics,
                         ),
                       ],
                     ),

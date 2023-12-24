@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -8,7 +10,6 @@ import 'package:get/get.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:tpi_programming_club/app/views/accounts/login_widget_controller.dart';
 import 'package:tpi_programming_club/app/views/accounts/init.dart';
 import 'package:tpi_programming_club/app/views/accounts/verification/sent_verification_email.dart';
 
@@ -33,9 +34,6 @@ class _SignInState extends State<SignIn> {
   FocusNode passwordFocusNode = FocusNode();
   FocusNode emailFocusNode = FocusNode();
   FocusNode confirmFocusNode = FocusNode();
-  final AccountWidgetController accountGetController =
-      Get.put(AccountWidgetController());
-
   Future<UserCredential> signInWithGoogleAndroid() async {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -71,11 +69,13 @@ class _SignInState extends State<SignIn> {
 
   void signUp() async {
     if (signUpValidationKey.currentState!.validate()) {
-      accountGetController.signUp.value = Center(
-        child: LoadingAnimationWidget.staggeredDotsWave(
-            color: Colors.blue, size: 40),
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => Center(
+          child: LoadingAnimationWidget.staggeredDotsWave(
+              color: Colors.blue, size: 40),
+        ),
       );
-
       // TO DO : sign in with email and password and store data on firestore
       try {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -97,8 +97,11 @@ class _SignInState extends State<SignIn> {
         await sentValidationEmail();
 
         Get.offAll(() => const InIt());
-        accountGetController.signUp.value = const Center(
-          child: Icon(Icons.done),
+        showModalBottomSheet(
+          context: context,
+          builder: (context) => const Center(
+            child: Icon(Icons.done),
+          ),
         );
       } on FirebaseAuthException catch (e) {
         Fluttertoast.showToast(
@@ -108,10 +111,13 @@ class _SignInState extends State<SignIn> {
           toastLength: Toast.LENGTH_LONG,
           timeInSecForIosWeb: 5,
         );
-        accountGetController.signUp.value = const Center(
-          child: Text(
-            "Signup faild, try again",
-            style: TextStyle(fontSize: 26, color: Colors.deepOrange),
+        showModalBottomSheet(
+          context: context,
+          builder: (context) => const Center(
+            child: Text(
+              "Signup faild, try again",
+              style: TextStyle(fontSize: 26, color: Colors.deepOrange),
+            ),
           ),
         );
       }
@@ -303,21 +309,24 @@ class _SignInState extends State<SignIn> {
                         const SizedBox(
                           height: 15,
                         ),
-                        Obx(
-                          () => ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              maximumSize: const Size(380, 50),
-                              minimumSize: const Size(380, 50),
-                              backgroundColor:
-                                  ConstantThemeData().primaryColour,
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
                             ),
-                            onPressed: () {
-                              signUp();
-                            },
-                            child: accountGetController.signUp.value,
+                            maximumSize: const Size(380, 50),
+                            minimumSize: const Size(380, 50),
+                            backgroundColor: ConstantThemeData().primaryColour,
+                          ),
+                          onPressed: () {
+                            signUp();
+                          },
+                          child: const Text(
+                            "Sign In",
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -373,7 +382,7 @@ class _SignInState extends State<SignIn> {
                             const Text("Have already an account?"),
                             TextButton(
                               onPressed: () {
-                                Get.to(() => const LogIn());
+                                Get.offAll(() => const LogIn());
                               },
                               child: Text(
                                 "Login",
