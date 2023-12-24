@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/core/image_picker.dart';
 import 'package:tpi_programming_club/app/views/accounts/account_info_controller.dart';
@@ -64,28 +63,11 @@ class _PublishPostState extends State<PublishPost> {
               color: Colors.white, size: 40),
         );
       });
-      final count =
-          await FirebaseDatabase.instance.ref("/contents/count/").get();
-      int id = 0;
-      if (count.value != null) {
-        id = int.parse(count.value.toString());
-      }
+      int id = DateTime.now().millisecondsSinceEpoch;
 
-      final classContentRef = FirebaseDatabase.instance.ref("classContent");
-      int classContentCount = 0;
-      var classContentCountData =
-          await classContentRef.child('contentCount').get();
-      if (classContentCountData.value != null) {
-        classContentCount = int.parse(classContentCountData.value.toString());
-      }
       await FirebaseDatabase.instance
-          .ref("classContent/$classContentCount")
+          .ref("classContent/$id")
           .set(widget.content);
-      await FirebaseDatabase.instance
-          .ref("classContent/contentCount")
-          .set("${classContentCount + 1}");
-
-      String contentPath = "classContent/$classContentCount";
 
       PostModel post = PostModel(
         profile: accuntInfo.img.value,
@@ -99,7 +81,7 @@ class _PublishPostState extends State<PublishPost> {
         owner: owner!,
         ownerName: accuntInfo.name.value,
         description: descriptionController.text,
-        content: contentPath,
+        content: "classContent/$id",
         likeCount: "0",
         likes: {
           "id": Like(uid: "null", date: "date"),
@@ -118,22 +100,10 @@ class _PublishPostState extends State<PublishPost> {
         impression: "0",
       );
 
-      int classCount = 0;
-      var classCountData =
-          await FirebaseDatabase.instance.ref("/contents/$id/classCount").get();
-
-      if (classCountData.exists) {
-        classCount = int.parse(classCountData.value.toString());
-      }
-
       Map<String, dynamic> postDataMap = post.toMap();
-      var ref = FirebaseDatabase.instance.ref("/contents/$id/$classCount");
+      var ref = FirebaseDatabase.instance.ref("/contents/${widget.id}/$id/");
 
       await ref.set(postDataMap);
-      ref = FirebaseDatabase.instance.ref("/contents/$id/classCount");
-      ref.set(
-        "${(classCount + 1)}",
-      );
 
       // update user Data
       final user = FirebaseAuth.instance.currentUser!;
@@ -151,7 +121,7 @@ class _PublishPostState extends State<PublishPost> {
         posts: userData['posts'] ?? [],
         followers: userData['followers'] ?? [],
       );
-      accountModel.posts.add("/contents/$id/$classCount");
+      accountModel.posts.add("/contents/${widget.id}/$id/");
       await userRef.update(accountModel.toJson());
       showModalBottomSheet(
         context: context,
@@ -162,7 +132,7 @@ class _PublishPostState extends State<PublishPost> {
         ),
       );
 
-      Get.off(() => const HomePage());
+      Get.offAll(() => const HomePage());
 
       showDialog<String>(
         context: context,
@@ -193,15 +163,17 @@ class _PublishPostState extends State<PublishPost> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Center(
-                  child: Text(
-                    "We need some infomation about this post. Proper and detailed infromation will help your post to get by search easily. We also recommand to upload a photo that is releted with this post.",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.firaMono(
-                      color: Colors.white,
-                      textStyle: Theme.of(context).textTheme.bodyLarge,
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      "We need some infomation about this post. Proper and detailed infromation will help your post to get by search easily. We also recommand to upload a photo that is releted with this post.",
+                      textAlign: TextAlign.center,
                     ),
                   ),
+                ),
+                const SizedBox(
+                  height: 10,
                 ),
                 Container(
                   height: 200,

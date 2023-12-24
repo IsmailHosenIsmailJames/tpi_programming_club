@@ -25,9 +25,7 @@ class SelectTopics extends StatefulWidget {
 class _SelectTopicsState extends State<SelectTopics> {
   Future saveDatabaseResponce(Map<String, dynamic> decodedData) async {
     var box = Hive.box("tpi_programming_club");
-    decodedData.forEach((key, value) {
-      box.put("/contents/topics/$key/", value);
-    });
+    await box.put("/contents/topics/", decodedData);
   }
 
   @override
@@ -46,18 +44,17 @@ class _SelectTopicsState extends State<SelectTopics> {
             if (snapshot.hasData) {
               final data = snapshot.data!.value;
               if (data != null) {
-                final decodedData = jsonDecode(jsonEncode(data));
+                Map<String, dynamic> decodedData =
+                    Map<String, dynamic>.from(jsonDecode(jsonEncode(data)));
                 saveDatabaseResponce(decodedData);
 
-                int count = int.parse(decodedData['count']);
-
-                for (var i = 0; i < count; i++) {
-                  var topic = decodedData['$i'];
+                decodedData.forEach((key, value) {
+                  var topic = decodedData[key];
                   if (topic != null) {
                     TopicsModel obj = TopicsModel.fromJson(topic);
                     listOfTopics.add(obj);
                   }
-                }
+                });
               }
             }
           } else if (snapshot.connectionState == ConnectionState.active) {
@@ -67,17 +64,18 @@ class _SelectTopicsState extends State<SelectTopics> {
             );
           } else {
             try {
-              var box = Hive.box("tpi_programming_club");
-              int count = int.parse(box.get("/contents/topics/count/"));
-
-              for (var i = 0; i < count; i++) {
-                var topic = box.get("/contents/topics/$i/");
-                if (topic != null) {
+              final box = Hive.box("tpi_programming_club");
+              final topic = box.get("/contents/topics/");
+              Map<String, dynamic> decodedData =
+                  Map<String, dynamic>.from(jsonDecode(jsonEncode(topic)));
+              decodedData.forEach((key, value) {
+                var tem = decodedData[key];
+                if (tem != null) {
                   TopicsModel obj =
-                      TopicsModel.fromJson(jsonDecode(jsonEncode(topic)));
+                      TopicsModel.fromJson(jsonDecode(jsonEncode(tem)));
                   listOfTopics.add(obj);
                 }
-              }
+              });
             } catch (e) {
               if (kDebugMode) {
                 print(e);
@@ -161,7 +159,7 @@ class _SelectTopicsState extends State<SelectTopics> {
                             String name = listOfTopics[index].name;
                             String id = listOfTopics[index].id;
                             Get.to(
-                              MyQuillEditor(
+                              () => MyQuillEditor(
                                 name: name,
                                 id: id,
                               ),

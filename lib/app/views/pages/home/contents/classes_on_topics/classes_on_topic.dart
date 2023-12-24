@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/views/pages/home/contents/classes_on_topics/single_class_post.dart';
+import 'package:tpi_programming_club/app/views/pages/profile/public_profile_view.dart';
 
 import '../../../../../themes/app_theme_data.dart';
 import '../../../../../data/models/post_models.dart';
@@ -27,16 +28,12 @@ class ClassesOnTopics extends StatefulWidget {
 class _ClassesOnTopicsState extends State<ClassesOnTopics> {
   Future saveDatabaseResponce(Map<String, dynamic> decodedData) async {
     var box = Hive.box("tpi_programming_club");
-    decodedData.forEach((key, value) {
-      box.put("contents/$key", value);
-    });
+
+    box.put(widget.path, decodedData);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (kDebugMode) {
-      print(widget.path);
-    }
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -52,39 +49,36 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
             if (snapshot.hasData) {
               final data = snapshot.data!.value;
               if (data != null) {
-                final decodedData = jsonDecode(jsonEncode(data));
+                Map<String, dynamic> decodedData = jsonDecode(jsonEncode(data));
                 saveDatabaseResponce(decodedData);
 
-                int count = int.parse(decodedData['classCount']);
-
-                for (var i = 0; i < count; i++) {
-                  var topic = decodedData['$i'];
+                decodedData.forEach((key, value) {
+                  var topic = decodedData[key];
                   if (topic != null) {
                     PostModel obj = PostModel.fromMap(topic);
                     listOfTopics.add(obj);
                   }
-                }
+                });
               }
             }
           }
           if (listOfTopics.isEmpty) {
             try {
               var box = Hive.box("tpi_programming_club");
-              int count = int.parse(box.get("contents/classCount"));
+              final hiveData = box.get(widget.path);
 
-              for (var i = 0; i < count; i++) {
-                var contents = box.get("contents/$i", defaultValue: null);
-                if (contents != null) {
-                  PostModel obj = PostModel.fromJson(
+              Map<String, dynamic> decodedHiveData =
+                  jsonDecode(jsonEncode(hiveData));
+              decodedHiveData.forEach((key, value) {
+                PostModel obj = PostModel.fromMap(
+                  Map<String, dynamic>.from(
                     jsonDecode(
-                      jsonEncode(
-                        jsonEncode(contents),
-                      ),
+                      jsonEncode(decodedHiveData[key]),
                     ),
-                  );
-                  listOfTopics.add(obj);
-                }
-              }
+                  ),
+                );
+                listOfTopics.add(obj);
+              });
             } catch (e) {
               if (kDebugMode) {
                 print(e);
@@ -162,91 +156,104 @@ class _ClassesOnTopicsState extends State<ClassesOnTopics> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        height: 40,
-                                        width: 40,
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                            color: const Color.fromARGB(
-                                                83, 158, 158, 158)),
-                                        child: Center(
-                                          child: listOfTopics[index].img ==
-                                                  'null'
-                                              ? Text(
-                                                  listOfTopics[index]
-                                                      .ownerName
-                                                      .substring(0, 2),
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 40,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                )
-                                              : ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          100),
-                                                  child: CachedNetworkImage(
-                                                    imageUrl:
-                                                        listOfTopics[index].img,
-                                                    fit: BoxFit.scaleDown,
-                                                    progressIndicatorBuilder:
-                                                        (context, url,
-                                                                downloadProgress) =>
-                                                            Center(
-                                                      child: LoadingAnimationWidget
-                                                          .horizontalRotatingDots(
-                                                        color: Colors.white,
-                                                        size: 40,
-                                                      ),
-                                                    ),
-                                                    errorWidget: (context, url,
-                                                            error) =>
-                                                        const Icon(Icons.error),
-                                                  ),
-                                                ),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            listOfTopics[index]
+                                  GestureDetector(
+                                    onTap: () {
+                                      Get.to(() => PublicProfilePage(
+                                            uid: listOfTopics[index].ownerUid,
+                                          ));
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          height: 40,
+                                          width: 40,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                              color: const Color.fromARGB(
+                                                  83, 158, 158, 158)),
+                                          child: Center(
+                                            child: listOfTopics[index]
+                                                        .profile ==
+                                                    'null'
+                                                ? Text(
+                                                    listOfTopics[index]
                                                         .ownerName
-                                                        .length >
-                                                    15
-                                                ? "${listOfTopics[index].ownerName.substring(0, 15)}..."
-                                                : listOfTopics[index].ownerName,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                                        .substring(0, 2),
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 40,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  )
+                                                : ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            100),
+                                                    child: CachedNetworkImage(
+                                                      imageUrl:
+                                                          listOfTopics[index]
+                                                              .profile,
+                                                      fit: BoxFit.scaleDown,
+                                                      progressIndicatorBuilder:
+                                                          (context, url,
+                                                                  downloadProgress) =>
+                                                              Center(
+                                                        child: LoadingAnimationWidget
+                                                            .horizontalRotatingDots(
+                                                          color: Colors.white,
+                                                          size: 40,
+                                                        ),
+                                                      ),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          const Icon(
+                                                              Icons.error),
+                                                    ),
+                                                  ),
                                           ),
-                                          Text(
-                                            listOfTopics[index].owner.length >
-                                                    20
-                                                ? "${listOfTopics[index].owner.substring(0, 20)}..."
-                                                : listOfTopics[index].owner,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontSize: 12,
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              listOfTopics[index]
+                                                          .ownerName
+                                                          .length >
+                                                      15
+                                                  ? "${listOfTopics[index].ownerName.substring(0, 15)}..."
+                                                  : listOfTopics[index]
+                                                      .ownerName,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      )
-                                    ],
+                                            Text(
+                                              listOfTopics[index].owner.length >
+                                                      20
+                                                  ? "${listOfTopics[index].owner.substring(0, 20)}..."
+                                                  : listOfTopics[index].owner,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
                                   const SizedBox(
                                     height: 3,

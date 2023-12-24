@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
@@ -199,7 +200,8 @@ class _SingleClassPostState extends State<SingleClassPost> {
               if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.data != null) {
                   if (snapshot.hasData) {
-                    final data = jsonDecode(jsonEncode(snapshot.data!.value));
+                    final userData =
+                        jsonDecode(jsonEncode(snapshot.data!.value));
                     return Row(
                       children: [
                         SizedBox(
@@ -207,7 +209,7 @@ class _SingleClassPostState extends State<SingleClassPost> {
                           width: 60,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(100),
-                            child: data['img'] == 'null'
+                            child: userData['img'] == 'null'
                                 ? Center(
                                     child: Text(
                                       postData.ownerName.substring(0, 2),
@@ -219,7 +221,7 @@ class _SingleClassPostState extends State<SingleClassPost> {
                                     ),
                                   )
                                 : CachedNetworkImage(
-                                    imageUrl: data['img'],
+                                    imageUrl: userData['img'],
                                     fit: BoxFit.scaleDown,
                                     progressIndicatorBuilder:
                                         (context, url, downloadProgress) {
@@ -304,21 +306,41 @@ class _SingleClassPostState extends State<SingleClassPost> {
           ),
         );
       });
-
-      final firebasePostData =
-          await FirebaseDatabase.instance.ref(postData.content).get();
       String contentData = "";
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        try {
+          final box = Hive.box("tpi_programming_club");
+          contentData = box.get(postData.content).toString();
+        } catch (e) {
+          if (kDebugMode) {
+            print(e);
+          }
+        }
+      } else {
+        final firebasePostData =
+            await FirebaseDatabase.instance.ref(postData.content).get();
 
-      if (firebasePostData.exists) {
-        final data = firebasePostData.value;
-        if (data != null) {
-          try {
-            final box = Hive.box("tpi_programming_club");
-            box.put(postData.content, data.toString());
-            contentData = data.toString();
-          } catch (e) {
-            if (kDebugMode) {
-              print(e);
+        if (firebasePostData.exists) {
+          final data = firebasePostData.value;
+          if (data != null) {
+            try {
+              final box = Hive.box("tpi_programming_club");
+              box.put(postData.content, data.toString());
+              contentData = data.toString();
+            } catch (e) {
+              if (kDebugMode) {
+                print(e);
+              }
+            }
+          } else {
+            try {
+              final box = Hive.box("tpi_programming_club");
+              contentData = box.get(postData.content).toString();
+            } catch (e) {
+              if (kDebugMode) {
+                print(e);
+              }
             }
           }
         } else {
@@ -329,15 +351,6 @@ class _SingleClassPostState extends State<SingleClassPost> {
             if (kDebugMode) {
               print(e);
             }
-          }
-        }
-      } else {
-        try {
-          final box = Hive.box("tpi_programming_club");
-          contentData = box.get(postData.content).toString();
-        } catch (e) {
-          if (kDebugMode) {
-            print(e);
           }
         }
       }

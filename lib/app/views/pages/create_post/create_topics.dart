@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tpi_programming_club/app/core/image_picker.dart';
+import 'package:tpi_programming_club/app/core/show_toast_meassage.dart';
 import 'package:tpi_programming_club/app/views/pages/drawer/drawer.dart';
 import 'package:tpi_programming_club/app/data/models/topics_model.dart';
 
-import 'getx_create_post_controller.dart';
 import 'select_topics.dart';
 
 class CreateTopics extends StatefulWidget {
@@ -17,8 +17,6 @@ class CreateTopics extends StatefulWidget {
 }
 
 class _CreateTopicsState extends State<CreateTopics> {
-  final controller = Get.put(CreatePostController());
-
   final validationKey = GlobalKey<FormState>();
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -26,6 +24,18 @@ class _CreateTopicsState extends State<CreateTopics> {
   String? imgUrl;
   String? title;
   String? description;
+
+  Widget imagePlacholder = const SizedBox(
+    child: Center(
+      child: Icon(Icons.add_photo_alternate_outlined),
+    ),
+  );
+  Widget loadingIconOnUploadIMage = const SizedBox(
+    child: Text("Choice an Image"),
+  );
+  Widget loadingIconOnPublishTopics = const SizedBox(
+    child: Text("Publish"),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -41,16 +51,14 @@ class _CreateTopicsState extends State<CreateTopics> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Obx(
-                () => Container(
-                  height: 200,
-                  width: 200,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(83, 33, 149, 243),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: controller.imageWidget.value,
+              Container(
+                height: 200,
+                width: 200,
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(83, 33, 149, 243),
+                  borderRadius: BorderRadius.circular(15),
                 ),
+                child: imagePlacholder,
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -61,10 +69,12 @@ class _CreateTopicsState extends State<CreateTopics> {
                   minimumSize: const Size(200, 35),
                 ),
                 onPressed: () async {
-                  controller.loadingIconOnUploadeImage.value = SizedBox(
-                    child: LoadingAnimationWidget.staggeredDotsWave(
-                        color: Colors.white, size: 40),
-                  );
+                  setState(() {
+                    loadingIconOnUploadIMage = SizedBox(
+                      child: LoadingAnimationWidget.staggeredDotsWave(
+                          color: Colors.white, size: 40),
+                    );
+                  });
                   final count = await FirebaseDatabase.instance
                       .ref()
                       .child("/contents/topics/count/")
@@ -76,20 +86,22 @@ class _CreateTopicsState extends State<CreateTopics> {
                   PickPhotoFileWithUrlMobile img =
                       await pickPhotoMobile("/contents/topics/$id");
                   if (img.imageFile != null) {
-                    controller.imageWidget.value = SizedBox(
-                      child: Image.file(img.imageFile!, fit: BoxFit.cover),
-                    );
+                    setState(() {
+                      imagePlacholder = SizedBox(
+                        child: Image.file(img.imageFile!, fit: BoxFit.cover),
+                      );
+                    });
                   }
                   if (img.url != null) {
                     imgUrl = img.url;
                   }
-                  controller.loadingIconOnUploadeImage.value = const SizedBox(
-                    child: Text("Choice an Image"),
-                  );
+                  setState(() {
+                    loadingIconOnUploadIMage = const SizedBox(
+                      child: Text("Choice an Image"),
+                    );
+                  });
                 },
-                child: Obx(
-                  () => controller.loadingIconOnUploadeImage.value,
-                ),
+                child: loadingIconOnUploadIMage,
               ),
               Form(
                 key: validationKey,
@@ -163,75 +175,60 @@ class _CreateTopicsState extends State<CreateTopics> {
                       const SizedBox(
                         height: 15,
                       ),
-                      Obx(
-                        () => ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            minimumSize: const Size(double.infinity, 50),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          onPressed: () async {
-                            controller.loadingIconOnUploadeTopics.value =
-                                SizedBox(
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        onPressed: () async {
+                          setState(() {
+                            loadingIconOnPublishTopics = SizedBox(
                               child: LoadingAnimationWidget.staggeredDotsWave(
                                   color: Colors.white, size: 40),
                             );
-                            if (validationKey.currentState!.validate()) {
-                              if (imgUrl != null) {
-                                final count = await FirebaseDatabase.instance
-                                    .ref()
-                                    .child("/contents/topics/count/")
-                                    .get();
-                                int id = 0;
-                                if (count.value != null) {
-                                  id = int.parse(count.value.toString());
-                                }
-                                TopicsModel topicsModel = TopicsModel(
-                                  id: "$id",
-                                  name: titleController.text,
-                                  description: descriptionController.text,
-                                  img: imgUrl!,
-                                  like: "0",
-                                  share: "0",
-                                  classNumber: "0",
-                                );
-                                final ref = FirebaseDatabase.instance
-                                    .ref("/contents/topics/$id");
-                                await ref.set(topicsModel.toJson());
+                          });
+                          if (validationKey.currentState!.validate()) {
+                            if (imgUrl != null) {
+                              int id = DateTime.now().millisecondsSinceEpoch;
 
-                                await FirebaseDatabase.instance
-                                    .ref("/contents/topics/count")
-                                    .set(
-                                      "${(id + 1)}",
-                                    );
-                                Get.to(() => const SelectTopics());
+                              TopicsModel topicsModel = TopicsModel(
+                                id: "$id",
+                                name: titleController.text,
+                                description: descriptionController.text,
+                                img: imgUrl!,
+                                like: "0",
+                                share: "0",
+                                classNumber: "0",
+                              );
+                              final ref = FirebaseDatabase.instance
+                                  .ref("/contents/topics/$id");
+                              await ref.set(topicsModel.toJson());
+                              Get.off(() => const SelectTopics());
 
-                                // ignore: use_build_context_synchronously
-                                showDialog<String>(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Successfully Uploaded'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context, 'OK');
-                                        },
-                                        child: const Text('OK'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
+                              // ignore: use_build_context_synchronously
+                              showDialog<String>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Successfully Uploaded'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context, 'OK');
+                                      },
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else {
+                              showToast("Select Image firest");
                             }
-                            controller.loadingIconOnUploadeTopics.value =
-                                const SizedBox(
-                              child: Text("Uploaded Successfully"),
-                            );
-                          },
-                          child: controller.loadingIconOnUploadeTopics.value,
-                        ),
+                          }
+                        },
+                        child: loadingIconOnPublishTopics,
                       ),
                     ],
                   ),

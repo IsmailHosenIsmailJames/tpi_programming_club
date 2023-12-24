@@ -35,7 +35,7 @@ class TopicsModel {
         img: json["img"],
         like: json["like"],
         share: json["share"],
-        classNumber: json["class_number"],
+        classNumber: json["classNumber"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -45,6 +45,6 @@ class TopicsModel {
         "img": img,
         "like": like,
         "share": share,
-        "class_number": classNumber,
+        "classNumber": classNumber,
       };
 }
