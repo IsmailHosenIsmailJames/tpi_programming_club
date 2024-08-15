@@ -1,3 +1,3 @@
 # tpi_programming_club
 
-### Note: App under rewriting
+A cross platform supported app for tpi_programming_club.

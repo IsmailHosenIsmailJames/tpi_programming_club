@@ -1,132 +1,403 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
+// ignore_for_file: use_build_context_synchronously
 
-import 'firebase_options.dart';
+import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:flutter/services.dart';
+
+import 'package:rive/rive.dart' hide Image;
+
+import 'src/theme/break_point.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const HomeScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _HomeScreenState extends State<HomeScreen> {
+  String validEmail = "Dandi@gmail.com";
+  String validPassword = "12345";
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  /// input form controller
+  FocusNode emailFocusNode = FocusNode();
+  TextEditingController emailController = TextEditingController();
+
+  FocusNode passwordFocusNode = FocusNode();
+  TextEditingController passwordController = TextEditingController();
+
+  FocusNode fullNameFocusNode = FocusNode();
+  TextEditingController fullNameController = TextEditingController();
+
+  FocusNode boardRollFocusNode = FocusNode();
+  TextEditingController boardRollController = TextEditingController();
+
+  FocusNode sessionFocusNode = FocusNode();
+  TextEditingController sessionController = TextEditingController();
+
+  /// rive controller and input
+  StateMachineController? controller;
+
+  SMIInput<bool>? isChecking;
+  SMIInput<double>? numLook;
+  SMIInput<bool>? isHandsUp;
+
+  SMIInput<bool>? trigSuccess;
+  SMIInput<bool>? trigFail;
+
+  @override
+  void initState() {
+    emailFocusNode.addListener(emailFocus);
+    passwordFocusNode.addListener(passwordFocus);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    emailFocusNode.removeListener(emailFocus);
+    passwordFocusNode.removeListener(passwordFocus);
+    super.dispose();
+  }
+
+  void emailFocus() {
+    isChecking?.change(emailFocusNode.hasFocus);
+  }
+
+  void passwordFocus() {
+    isHandsUp?.change(passwordFocusNode.hasFocus);
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final window = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      backgroundColor: breakPoint < window.width
+          ? const Color.fromARGB(255, 1, 53, 131)
+          : const Color(0xFFD6E2EA),
+      resizeToAvoidBottomInset: true,
+      body: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: breakPoint < window.width
+                ? Container(
+                    padding:
+                        const EdgeInsets.only(left: 20, right: 20, top: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Spacer(),
+                        const Text(
+                          "Be with us\nfor better community\nand better future.",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const Gap(30),
+                        const Text(
+                          "Be with",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          "TPI Programming Club",
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.blue.shade300,
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          height: 150,
+                          width: 150,
+                          decoration: BoxDecoration(
+                            image: const DecorationImage(
+                              image: AssetImage("assets/img/logo.jpeg"),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        const Gap(20),
+                        const Text(
+                          "TPI Programming Club",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const Spacer(),
+                      ],
+                    ),
+                  )
+                : const SizedBox(),
+          ),
+          Expanded(
+            flex: 3,
+            child: Container(
+              height: window.height,
+              decoration: breakPoint < window.width
+                  ? const BoxDecoration(
+                      color: Color(0xFFD6E2EA),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(40),
+                          bottomLeft: Radius.circular(40)))
+                  : null,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const Gap(20),
+                    const Text(
+                      "Create your account",
+                      style: TextStyle(
+                        fontSize: 34,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 300,
+                      width: 300,
+                      child: RiveAnimation.asset(
+                        "assets/animations/animated_login_character.riv",
+                        fit: BoxFit.fitHeight,
+                        stateMachines: const ["Login Machine"],
+                        onInit: (artboard) {
+                          controller = StateMachineController.fromArtboard(
+                            artboard,
+
+                            /// from rive, you can see it in rive editor
+                            "Login Machine",
+                          );
+                          if (controller == null) return;
+
+                          artboard.addController(controller!);
+                          isChecking = controller?.findInput("isChecking");
+                          numLook = controller?.findInput("numLook");
+                          isHandsUp = controller?.findInput("isHandsUp");
+                          trigSuccess = controller?.findInput("trigSuccess");
+                          trigFail = controller?.findInput("trigFail");
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: 500,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              child: TextField(
+                                focusNode: passwordFocusNode,
+                                controller: passwordController,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "Full Name",
+                                ),
+                                obscureText: true,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                                onChanged: (value) {},
+                              ),
+                            ),
+                            const Gap(10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              child: TextField(
+                                focusNode: emailFocusNode,
+                                controller: emailController,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "Email",
+                                ),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                                onChanged: (value) {
+                                  numLook?.change(value.length.toDouble());
+                                },
+                              ),
+                            ),
+                            const Gap(10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              child: TextField(
+                                focusNode: passwordFocusNode,
+                                controller: passwordController,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "Password",
+                                ),
+                                obscureText: true,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                                onChanged: (value) {},
+                              ),
+                            ),
+                            const Gap(10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              child: TextField(
+                                focusNode: passwordFocusNode,
+                                controller: passwordController,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "Password",
+                                ),
+                                obscureText: true,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                                onChanged: (value) {},
+                              ),
+                            ),
+                            const Gap(10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              child: TextField(
+                                focusNode: passwordFocusNode,
+                                controller: passwordController,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "Password",
+                                ),
+                                obscureText: true,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                                onChanged: (value) {},
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              height: 64,
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  emailFocusNode.unfocus();
+                                  passwordFocusNode.unfocus();
+
+                                  final email = emailController.text;
+                                  final password = passwordController.text;
+
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => const Dialog(
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    ),
+                                  );
+                                  await Future.delayed(
+                                    const Duration(milliseconds: 2000),
+                                  );
+                                  if (mounted) Navigator.pop(context);
+
+                                  if (email == validEmail &&
+                                      password == validPassword) {
+                                    trigSuccess?.change(true);
+                                  } else {
+                                    trigFail?.change(true);
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: const Text("Login"),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
