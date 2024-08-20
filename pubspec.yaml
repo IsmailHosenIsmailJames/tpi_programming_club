@@ -52,6 +52,11 @@ dependencies:
   rive: ^0.13.4
   gap: ^3.0.1
   bottom_picker: ^2.8.0
+  email_validator: ^3.0.0
+  get: ^5.0.0-release-candidate-9
+  toastification: ^2.1.0
+  google_fonts: ^6.2.1
+
   
 
 dev_dependencies:
